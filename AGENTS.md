@@ -10,6 +10,8 @@ A Mars source package providing composable creative writing agents and skills fo
 
 **`skills/` vs `plugin/`:** `skills/` and `agents/` are the Mars source: consumed by Claude Code and meridian-cli projects via `mars add`. `plugin/` is Mars-owned output: `mars build plugin` lowers the source plus the dependency graph into Claude/Codex/Grok, Cursor, and OpenCode trees and writes the marketplace catalogs. Never edit `plugin/` or those catalogs by hand; edit the source and rebuild (see [Building the plugin](#building-the-plugin)). CI fails on a stale or hand-edited tree.
 
+**`plugin/antigravity/`:** The Google Antigravity 2.0 native plugin target generated deterministically by `python3 scripts/build_antigravity.py` from `plugin/claude/`, `antigravity/agents.toml`, `antigravity/patches.toml`, and `antigravity/overlay/`. Never edit `plugin/antigravity/` by hand; changes should be made to `antigravity/` configuration, overlay files, or patches, followed by rebuilding and verifying with `python3 scripts/check_antigravity.py` and `agy plugin validate --strict plugin/antigravity`.
+
 **Agents vs skills:** Agents are spawned as independent processes (orchestrators, writers, critics). Skills are reference material loaded into agent context (craft knowledge, patterns, conventions). See `agents/` and `skills/` directories.
 
 **Destination sync:** Comes from the `writing-sync` Mars dependency (`haowjy/writing-sync`), not this repo. Do not vendor those skills here.
@@ -63,6 +65,18 @@ The build reads published state only (`mars.toml` plus the dependency graph), ne
 
 **Plugin manifest:** `plugin/claude/.claude-plugin/plugin.json` is generated from `[package]` (name, version, description, first author, homepage, license). Claude Code auto-discovers components without it, but the marketplace **add-from-GitHub** path (Cowork / claude.ai) validates the plugin and *rejects it* if the manifest is missing. `claude plugins validate .claude-plugin/marketplace.json` only checks the marketplace schema, not the plugin — so CI also runs `claude plugins validate plugin/claude`, which validates the manifest plus every agent/skill component file.
 
+### Building the Google Antigravity 2.0 Plugin
+
+`python3 scripts/build_antigravity.py` lowers the resolved `plugin/claude/` tree into `plugin/antigravity/` for the Google Antigravity 2.0 Desktop App and `agy` CLI:
+
+- **Source inputs**: reads package metadata from `mars.toml`, agent frontmatter policies from `antigravity/agents.toml`, SHA-256 gated string replacements from `antigravity/patches.toml`, and overlay assets from `antigravity/overlay/`.
+- **Model policy**: Enforces user model directive: `muse` model set to `inherit` (author adjusts in main session), and all 14 subagents configured to `flash` (Gemini 3.8 Flash), differentiating roles via specialized prompts and skill bindings.
+- **Reference lowering**: Rewrites Claude `/creative-writing-skills:<skill>` references to native `/<skill>`.
+- **Frontmatter sanitization**: Strips Claude/Mars-specific artifacts (`disallowedTools`, `AskUserQuestion`, `NotebookEdit`, `Bash(git ...)`, `effort`, `opus`, `sonnet`, `argon`, `luna`). Enforces `commandExecutionPolicy: sandbox`.
+- **Role constraints**: Appends explicit read-only instructions to reviewer agents (`critic`, `reader-sim`, `continuity-checker`, `cold-reader`, `explorer`, `session-miner`) and caller-reporting instructions to subagents so they never prompt the author directly.
+- **Patches & overlay**: Verifies upstream file SHA-256 hashes before patching; injects `assets/logo.svg`, rules (`story-project.md`, `kb-pages.md`), guides (`antigravity.md`, `antigravity-dispatch.md`), and PreToolUse safety hook (`hooks.json`, `scripts/git_guard.py` with `chmod 0755`).
+- **Integrity verification**: Run `python3 scripts/check_antigravity.py` and `agy plugin validate --strict plugin/antigravity` to confirm 0 errors and 0 warnings.
+
 ## Design Patterns
 
 **Source tagging (brainstorming):** Untagged = user stated. `<AI>...</AI>` = AI suggestion. `<hidden>...</hidden>` = author-only (twists, secrets).
@@ -81,19 +95,25 @@ The build reads published state only (`mars.toml` plus the dependency graph), ne
 
 **Rebuild the plugin:** `mars build plugin`, then commit `plugin/`
 
-**Validate plugin manifest:** `claude plugins validate .claude-plugin/marketplace.json` (marketplace schema) and `claude plugins validate plugin/claude` (plugin manifest + components)
+**Build Antigravity plugin:** `python3 scripts/build_antigravity.py` rebuilds `plugin/antigravity/`
+
+**Check Antigravity plugin:** `python3 scripts/check_antigravity.py` verifies referential integrity, model tiers, and remnant eradication
+
+**Test Antigravity plugin (E2E):** `python3 tests/e2e_antigravity_test.py` runs all 89 test cases across Tiers 1-4
+
+**Validate plugin manifest:** `claude plugins validate .claude-plugin/marketplace.json` (marketplace schema), `claude plugins validate plugin/claude` (Claude components), and `agy plugin validate --strict plugin/antigravity` (Antigravity components)
 
 **Release flow:** `mars version <patch|minor|major> --push` bumps `mars.toml`, rebuilds `plugin/`, promotes CHANGELOG `[Unreleased]`, commits `vX.Y.Z`, tags it and pushes. CI creates the GitHub Release with `.skill` artifacts.
 
-**Pre-commit hook:** `.githooks/pre-commit` front-loads the distribution-breaking checks (`mars build plugin` + `mars check`, then a dirty-tree check on the generated paths, then the reference check, then `claude plugins validate` for the Claude tree and marketplace) so they fire at commit time instead of only in CI. It's committed but not auto-installed — enable it once per clone:
+**Pre-commit hook:** `.githooks/pre-commit` front-loads the distribution-breaking checks (`mars build plugin` + `mars check`, dirty-tree check on generated paths, reference check, `claude plugins validate`, Antigravity `scripts/build_antigravity.py` + `scripts/check_antigravity.py`, and `agy plugin validate --strict`) so they fire at commit time instead of only in CI. It's committed but not auto-installed — enable it once per clone:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-It blocks the commit on failure; bypass a single commit with `git commit --no-verify`. (Skips a check when its CLI, `mars` or `claude`, isn't on PATH.)
+It blocks the commit on failure; bypass a single commit with `git commit --no-verify`. (Skips a check when its CLI, `mars`, `claude`, or `agy`, isn't on PATH.)
 
-**CI:** PRs run `mars check` + a rebuild-and-diff check on `plugin/` and the root catalogs + the reference check (`scripts/check_refs.py`) + Claude plugin/marketplace validation (`claude plugins validate`) + frontmatter validation + zip build. `mars check` only warns about stale output, so the rebuild-and-diff step is what fails the build. CI pins `mars-agents==0.26.2` because the committed tree is compared against the Mars that built it. Tag pushes create releases.
+**CI:** PRs run `mars check` + rebuild-and-diff on `plugin/` and root catalogs + reference checks + Claude plugin validation + frontmatter validation + zip build, alongside a dedicated `antigravity` job that rebuilds `plugin/antigravity`, checks for stale tree differences, runs `scripts/check_antigravity.py`, runs the 89-test E2E suite, and tests strict `agy plugin validate` and isolated local installation. CI pins `mars-agents==0.26.2` because the committed tree is compared against the Mars that built it. Tag pushes create releases.
 
 ## Conventions
 

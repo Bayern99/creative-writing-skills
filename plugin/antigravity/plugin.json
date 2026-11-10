@@ -1,0 +1,28 @@
+{
+  "$schema": "https://antigravity.google/schemas/plugin.json",
+  "name": "creative-writing-skills",
+  "version": "0.7.4",
+  "displayName": "Creative Writing",
+  "description": "Composable agents and skills for creative writing projects. The muse agent is the primary entry point: a creative partner that brainstorms, drafts, critiques, and maintains your story's knowledge base. On claude.ai (skills only), activate the creative-writing-muse skill instead.",
+  "author": {
+    "name": "Jimmy Yao",
+    "email": "dev.jimm.py@gmail.com"
+  },
+  "homepage": "https://github.com/haowjy/creative-writing-skills",
+  "repository": "https://github.com/haowjy/creative-writing-skills",
+  "license": "Apache-2.0",
+  "logo": "assets/logo.svg",
+  "keywords": [
+    "creative-writing",
+    "fiction",
+    "novel",
+    "storytelling",
+    "multi-agent",
+    "muse"
+  ],
+  "suggestedPrompts": [
+    "Set up my creative writing project",
+    "Brainstorm directions for my next chapter",
+    "Review this draft for character voice and narrative pacing"
+  ]
+}

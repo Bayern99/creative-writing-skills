@@ -1,0 +1,237 @@
+# antigravity/agents.toml
+# Source configuration for building Antigravity 2.0 agents from plugin/claude/agents/
+
+[defaults]
+commandExecutionPolicy = "sandbox"
+mainAgent = false
+subagent = true
+model = "flash"
+
+[agents.muse]
+model = "inherit"
+mainAgent = true
+subagent = false
+role = "orchestrator"
+description = "Author-facing creative partner for all story work: talks through the story, plans and drafts it with the author, spawns critique, continuity, reader-sim, research and knowledge-capture lanes, and owns the verdict on each draft. Select as your main agent for story sessions."
+skills = [
+  "skills/creative-writing-muse",
+  "skills/story-workflow",
+  "skills/story-planning",
+  "skills/creative-writing-craft",
+  "skills/writing-principles",
+  "skills/story-memory",
+  "skills/intent-modeling",
+  "skills/llm-writing",
+  "skills/writing-staffing",
+]
+optional_skills = [
+  "skills/story-review",
+  "skills/reader-sim",
+  "skills/character-sim",
+  "skills/creative-research",
+  "skills/shared-dao",
+  "skills/grill-with-docs",
+  "skills/structured-artifact",
+]
+subagents = [
+  "brainstormer",
+  "character-sim",
+  "cold-reader",
+  "continuity-checker",
+  "critic",
+  "creative-researcher",
+  "explorer",
+  "kb-lead",
+  "kb-maintainer",
+  "outliner",
+  "reader-sim",
+  "session-miner",
+  "style-creator",
+  "writer",
+]
+
+[agents.writer]
+model = "flash"
+mainAgent = true
+subagent = true
+role = "producer"
+skills = [
+  "skills/creative-writing-craft",
+  "skills/writing-principles",
+  "skills/story-memory",
+]
+optional_skills = [
+  "skills/story-review",
+  "skills/character-sim",
+  "skills/shared-dao",
+]
+
+[agents.character-sim]
+model = "flash"
+mainAgent = true
+subagent = true
+role = "simulator"
+skills = [
+  "skills/character-sim",
+  "skills/writing-principles",
+  "skills/llm-writing",
+]
+optional_skills = [
+  "skills/story-memory",
+]
+
+[agents.outliner]
+model = "flash"
+mainAgent = true
+subagent = true
+role = "planner"
+skills = [
+  "skills/story-planning",
+  "skills/story-memory",
+  "skills/md-validation",
+]
+
+[agents.critic]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = [
+  "skills/story-review",
+  "skills/writing-principles",
+  "skills/story-memory",
+]
+optional_skills = [
+  "skills/creative-writing-craft",
+  "skills/shared-dao",
+]
+
+[agents.brainstormer]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "producer"
+skills = [
+  "skills/story-planning",
+  "skills/story-memory",
+  "skills/intent-modeling",
+  "skills/llm-writing",
+]
+
+[agents.continuity-checker]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = [
+  "skills/story-review",
+  "skills/md-validation",
+  "skills/shared-dao",
+  "skills/story-memory",
+]
+
+[agents.reader-sim]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = [
+  "skills/reader-sim",
+  "skills/writing-principles",
+  "skills/llm-writing",
+]
+
+[agents.style-creator]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "producer"
+skills = [
+  "skills/creative-writing-craft",
+  "skills/writing-principles",
+  "skills/llm-writing",
+]
+optional_skills = [
+  "skills/story-memory",
+]
+
+[agents.creative-researcher]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "researcher"
+skills = [
+  "skills/creative-research",
+]
+
+[agents.kb-lead]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "lead"
+skills = [
+  "skills/shared-dao",
+  "skills/knowledge-layers",
+  "skills/qi-maintenance",
+  "skills/llm-writing",
+  "skills/information-hierarchy",
+]
+optional_skills = [
+  "skills/qi-layer",
+  "skills/intent-modeling",
+  "skills/shared-workspace",
+  "skills/md-validation",
+]
+subagents = [
+  "explorer",
+  "session-miner",
+  "cold-reader",
+  "kb-maintainer",
+]
+
+[agents.explorer]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = []
+
+[agents.session-miner]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = [
+  "skills/intent-modeling",
+]
+optional_skills = [
+  "skills/llm-writing",
+]
+
+[agents.cold-reader]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "reviewer"
+skills = [
+  "skills/llm-writing",
+]
+optional_skills = [
+  "skills/intent-modeling",
+  "skills/information-hierarchy",
+]
+
+[agents.kb-maintainer]
+model = "flash"
+mainAgent = false
+subagent = true
+role = "maintainer"
+skills = [
+  "skills/shared-dao",
+  "skills/shared-workspace",
+  "skills/llm-writing",
+  "skills/information-hierarchy",
+  "skills/knowledge-layers",
+  "skills/qi-layer",
+  "skills/md-validation",
+]

@@ -1,0 +1,104 @@
+# antigravity/patches.toml
+# Exact file modifications with upstream SHA-256 gating
+
+[[patches]]
+file = "skills/project-setup/SKILL.md"
+sha256 = "2cab923302a1bf993ff574bee24969f2515b603b7723f9ca574125f8331e93a0"
+description = "Replace multi-harness selection with Antigravity walkthrough"
+search = """## First, Load One Environment Walkthrough
+
+Ask the author where they work, or infer it from the session, then read exactly
+one of these and follow its setup and walkthrough:
+
+- `resources/meridian-cli.md` — meridian-cli, with the package installed by `mars add`.
+- `resources/claude-code.md` — Claude Code with this plugin.
+- `resources/claude-desktop.md` — claude.ai, Claude Desktop, or Cowork.
+- `resources/other-harnesses.md` — Codex, Cursor, OpenCode, or Grok.
+
+Do not load the others. Meridian Flow, the writing app, has no setup path yet:
+it will import packages once its importer ships, so use the environment you are
+in."""
+replace = """## First, Load the Antigravity Setup Guide
+
+Follow the setup and walkthrough in `resources/antigravity.md`:
+Run `/project-setup` in Antigravity Desktop or CLI, then select `muse` as your main agent in the Agent selector."""
+
+[[patches]]
+file = "skills/writing-staffing/SKILL.md"
+sha256 = "78c68a2cfda20c8e4f3c5106081dac44730c495c4001a19c29c1e4c1148d2dfc"
+description = "Replace meridian spawn and model family fan-out with native invoke_subagent"
+search = """## Model Selection
+
+Run every lane on its agent's default model. Lanes that look at different
+angles, focus areas or characters are **parallel lanes**, and the different
+prompts are what make them independent. Change a lane's model only when it
+needs a capability its default lacks.
+
+**Fan-out** is the exception: the same question and files sent to two model
+families, for a high-stakes or disputed call where their different blind spots
+are the point. A family is a provider: Opus, Sonnet and Fable are one family, so
+two Anthropic models add no diversity. Your harness's own agent tool usually
+reaches only its own provider, so fan out with `meridian spawn -m <model>`, and
+check the live catalog (`meridian mars models list`) and its prompting guidance
+(`meridian mars models prompting`) at dispatch time."""
+replace = """## Model Selection & Multi-Agent Dispatch
+
+In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
+
+By default, all subagents run on `model: flash` (Gemini 3.8 Flash), achieving differentiation through their distinct System Prompts and specialized skills. The main agent `muse` runs on `model: inherit` (inheriting your chosen model in the App/CLI).
+
+**Parallel lanes**: In `invoke_subagent`, you can pass multiple subagent definitions in a single call (e.g. structure, voice, and character critics) to run concurrently.
+
+**Multi-turn conversations**: `writer` retains context while idle. Use `send_message` to send round-2 revision feedback to the same `writer` instance to keep voice consistent. For reviewers (`critic`, `reader-sim`), open fresh instances each round for a clean cold-read perspective."""
+
+[[patches]]
+file = "skills/creative-writing-muse/SKILL.md"
+sha256 = "799e945b3a85f8227f3d4f5d0cd9e5bc2dbbaa401de7e0046fd0a5189364e129"
+description = "Update muse agent delegation wording for invoke_subagent"
+search = """When you can spawn this package's agents, the lanes `/creative-writing-skills:story-workflow`
+§ Produce names run in contexts of their own. Of the prose, `@writer` takes
+only an alternate take on another model, a polish pass the author asks for,
+and a draft long enough to fill your context."""
+replace = """When you can invoke this package's subagents via `invoke_subagent`, the lanes `/story-workflow`
+§ Produce names run in contexts of their own. Of the prose, `writer` takes
+fresh drafts, revision passes, polish passes, and drafts long enough to fill your context."""
+
+[[patches]]
+file = "skills/story-workflow/SKILL.md"
+sha256 = "1ccf67190eea402d22ca46c9782a794ecb3283eb44df2f0cdbf06c9d98a63576"
+description = "Update story-workflow subagent dispatch syntax"
+search = """When you can spawn this package's agents (`@critic`, `@writer`, `@kb-lead`
+and the rest), spawn the lanes that need a context of their own, as
+`/creative-writing-skills:writing-staffing` describes: critique, continuity, reader simulation,
+research, alternate takes, and knowledge capture. A critic that did not
+write the draft reads it the way a reader will, and a lane on another model
+brings other blind spots. Without them, run each lane yourself as its own
+pass, with the skill its agent would load (`/creative-writing-skills:story-review`, `/creative-writing-skills:reader-sim`,
+`/creative-writing-skills:creative-research`, `/creative-writing-skills:character-sim`, `/creative-writing-skills:shared-dao`, `/creative-writing-skills:story-memory`), and
+finish one stance before taking up the next: draft before judging, critique
+from the reader's side, revise the highest-impact issue first."""
+replace = """When you can invoke this package's subagents via `invoke_subagent` (`critic`, `writer`, `kb-lead`
+and the rest), invoke the lanes that need a context of their own, as
+`/writing-staffing` describes: critique, continuity, reader simulation,
+research, alternate takes, and knowledge capture. A critic that did not
+write the draft reads it the way a reader will. Without them, run each lane yourself as its own
+pass, with the skill its agent would load (`/story-review`, `/reader-sim`,
+`/creative-research`, `/character-sim`, `/shared-dao`, `/story-memory`), and
+finish one stance before taking up the next: draft before judging, critique
+from the reader's side, revise the highest-impact issue first."""
+
+[[patches]]
+file = "agents/session-miner.md"
+sha256 = "fbf1adb899baece2851d763f0c522abb86e2972389e35de4fec0a32fe175ef6c"
+description = "Direct session-miner to Antigravity transcript location"
+search = """Before mining, read the runtime's guidance on reading past sessions."""
+replace = """Before mining, inspect the Antigravity conversation transcripts at `<appDataDir>/brain/<id>/.system_generated/logs/transcript.jsonl` or session history files."""
+
+[[patches]]
+file = "skills/writing-sync/resources/installation.md"
+sha256 = "81a61d5183c10a8a77228c033f485c99e4a185791eb12ceb88996497648bccb7"
+description = "Update drive-sync paths for Antigravity plugin location"
+search = """UV_PROJECT_ENVIRONMENT=/external/drive-sync-venv uv sync --locked --no-editable --project /path/to/skills/writing-sync
+/external/drive-sync-venv/bin/drive-sync --help"""
+replace = """UV_PROJECT_ENVIRONMENT=~/.local/share/drive-sync-venv uv sync --locked --no-editable --project ~/.gemini/config/plugins/creative-writing-skills/skills/writing-sync
+~/.local/share/drive-sync-venv/bin/drive-sync --help"""

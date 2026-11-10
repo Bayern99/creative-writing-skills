@@ -58,6 +58,35 @@ else
   echo "pre-commit: 'claude' not on PATH — skipping plugin validation." >&2
 fi
 
+if [ "$fail" -eq 0 ]; then
+  echo "pre-commit: Antigravity plugin build & check (scripts/build_antigravity.py + check_antigravity.py)..."
+  if ! python3 scripts/build_antigravity.py; then
+    fail=1
+  elif ! python3 scripts/check_antigravity.py; then
+    fail=1
+  fi
+  if [ "$fail" -eq 0 ]; then
+    stale_agy=$(git diff --name-only -- plugin/antigravity)
+    untracked_agy=$(git ls-files --others --exclude-standard -- plugin/antigravity)
+    if [ -n "$stale_agy$untracked_agy" ]; then
+      echo >&2
+      echo "pre-commit: plugin/antigravity differs from index after rebuild:" >&2
+      printf '%s\n' "$stale_agy" "$untracked_agy" | grep -v '^$' | sed 's/^/  /' >&2
+      echo "pre-commit: the build is committed output — stage it and commit again." >&2
+      fail=1
+    fi
+  fi
+fi
+
+if command -v agy >/dev/null 2>&1; then
+  echo "pre-commit: Antigravity plugin strict validation (agy plugin validate --strict)..."
+  if ! agy plugin validate plugin/antigravity --strict; then
+    fail=1
+  fi
+else
+  echo "pre-commit: 'agy' not on PATH — skipping strict agy CLI validation." >&2
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo >&2
   echo "pre-commit: checks failed. Fix the above, or bypass with 'git commit --no-verify'." >&2

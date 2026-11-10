@@ -132,3 +132,66 @@ graph TD
     class KS,KC,KW,KT,KCN kb
     class M,W,C,E,R,CC,S,KL agent
 ```
+
+## Google Antigravity 2.0 Multi-Agent Runtime Architecture
+
+In Google Antigravity 2.0, the multi-agent system runs natively via the `invoke_subagent` and `send_message` protocols.
+
+### 1. Hub-and-Spoke Topology
+
+```mermaid
+graph TD
+    Author([Author]) <--> Muse["muse (Main Agent / Orchestrator)
+    model: inherit"]
+
+    subgraph EntryAgents ["Standalone Entry Agents (model: flash)"]
+        Writer["writer"]
+        CharSim["character-sim"]
+        Outliner["outliner"]
+    end
+
+    subgraph ReviewPanel ["Review & Analysis Panel (model: flash, read-only)"]
+        Critic["critic"]
+        ReaderSim["reader-sim"]
+        Continuity["continuity-checker"]
+        ColdReader["cold-reader"]
+        Explorer["explorer"]
+        SessionMiner["session-miner"]
+    end
+
+    subgraph ProductionLanes ["Ideation & Production (model: flash)"]
+        Brainstormer["brainstormer"]
+        StyleCreator["style-creator"]
+        Researcher["creative-researcher"]
+    end
+
+    subgraph KnowledgeCapture ["Knowledge Hierarchy (model: flash)"]
+        KBLead["kb-lead"] --> KBMaintainer["kb-maintainer"]
+        KBLead --> Explorer
+        KBLead --> SessionMiner
+        KBLead --> ColdReader
+    end
+
+    Muse -->|invoke_subagent| EntryAgents
+    Muse -->|invoke_subagent (parallel)| ReviewPanel
+    Muse -->|invoke_subagent| ProductionLanes
+    Muse -->|hand-off when settled| KBLead
+```
+
+### 2. Model Tier Policy & Role Specialization
+- **Primary Orchestrator (`muse`)**: `model: inherit`. Inherits the primary model chosen by the author in the Antigravity Desktop App or CLI.
+- **Specialized Subagents (14 agents)**: All configured to `model: flash` (Gemini 3.8 Flash). Rather than relying on cross-vendor model fan-out, role diversity and depth are achieved through:
+  - **Prompt Stances**: Explicit system prompt constraints (e.g. read-only reviewers, caller-reporting subagents).
+  - **Modular Skill Sets**: Each agent loads only its designated craft skills (e.g. `critic` loads `story-review`, `continuity-checker` loads `story-memory` + `md-validation`).
+  - **Context Isolation**: Each lane evaluates drafts in an unpolluted, independent context window.
+
+### 3. Native Orchestration Patterns
+- **Parallel Lane Fan-Out**: In `invoke_subagent`, `muse` dispatches multiple subagent definitions in a single call (e.g. `critic` for craft analysis, `reader-sim` for experiential reactions, and `continuity-checker` for canon verification) to evaluate a draft concurrently.
+- **Stateful Multi-Turn Revisions**: `writer` retains context while idle. `muse` sends round-2 revision feedback to the active `writer` instance using `send_message`, maintaining stylistic consistency across iterative drafts.
+- **Cold-Read Isolation**: Reviewers (`critic`, `reader-sim`) are spawned afresh per round, ensuring they evaluate drafts as naive readers without anchor bias from earlier drafting turns.
+- **Nested Delegation**: When story changes settle, `muse` delegates knowledge base capture to `kb-lead`, which in turn orchestrates `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer`.
+
+### 4. Safety & Rules Integration
+- **PreToolUse Safety Guard**: `hooks.json` intercepts `run_command` via `scripts/git_guard.py` (`0755`), preventing destructive git operations (`reset --hard`, `clean`, `restore`, `checkout --`, `revert`) by returning `{"decision": "ask"}`.
+- **Dynamic Rules**: `rules/story-project.md` activates on `model_decision` when working with creative projects; `rules/kb-pages.md` activates on `glob` (`kb/**/*.md`, `work/**/*.md`) to enforce link integrity and frontmatter cleanliness.
+

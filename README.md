@@ -13,19 +13,52 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ## Quick Start
 
-1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork) or [Claude.ai](#claudeai).
+1. **Install** for your environment: [Google Antigravity 2.0](#google-antigravity-20), [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork) or [Claude.ai](#claudeai).
 2. **Run project setup once, before you write anything.** Agents never start it for you; you do:
 
    | Environment | Run |
    |---|---|
+   | Google Antigravity 2.0 | `/project-setup` |
    | meridian-cli | `meridian bootstrap` (runs automatically in your first session) |
    | Claude Code / Cowork | `/creative-writing-skills:project-setup` |
    | Claude.ai | turn on `project-setup` and ask it to set up your project |
 
    It interviews you about the project, collects writing samples, and creates your `AGENTS.md`, the `kb/` layout and your first style files. Every agent reads those, so skipping this step makes them guess your conventions.
-3. **Start writing with muse**, your creative partner: `meridian` (meridian-cli), `claude --agent creative-writing-skills:muse` (Claude Code), or turn on `creative-writing-muse` (Claude.ai).
+3. **Start writing with muse**, your creative partner: select `muse` in Antigravity's Agent selector, `meridian` (meridian-cli), `claude --agent creative-writing-skills:muse` (Claude Code), or turn on `creative-writing-muse` (Claude.ai).
 
 ## Installation
+
+### Google Antigravity 2.0
+
+Install creative-writing-skills as a native Google Antigravity 2.0 plugin in the Desktop App or CLI.
+
+**Antigravity Desktop App**:
+1. Open Antigravity Desktop.
+2. Go to **Settings** → **Plugins** → **Install plugin** → **Install from local directory...**
+3. Select the `plugin/antigravity` folder from this repository.
+4. Open the Agent selector in any conversation and choose **muse** as your main agent.
+
+**Antigravity CLI (`agy`)**:
+Install from local path:
+```bash
+agy plugin install ./plugin/antigravity
+```
+
+Or install directly via GitHub subpath URL:
+```bash
+agy plugin install https://github.com/haowjy/creative-writing-skills/tree/main/plugin/antigravity
+```
+
+Once installed, verify discovery with:
+```bash
+agy plugin list --json
+agy agents
+```
+
+**First session workflow**:
+1. In your project directory, run `/project-setup` in Antigravity to create your `AGENTS.md`, `kb/` layout, and voice styles.
+2. Start writing with `muse`. Muse acts as your orchestrator and primary creative partner, using `invoke_subagent` to spawn specialized subagents (`critic`, `reader-sim`, `continuity-checker`, `writer`, `kb-lead`) in independent parallel contexts.
+3. **Model Strategy**: `muse` runs on `model: inherit`, respecting whatever model tier you select in the Desktop App or CLI. All 14 specialized subagents run on `model: flash` (Gemini 3.8 Flash), achieving distinct expertise through dedicated system prompts and craft skills.
 
 ### Mars (meridian-cli)
 
