@@ -7,6 +7,9 @@ mainAgent: true
 subagent: true
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
 skills:
   - skills/character-sim
   - skills/writing-principles

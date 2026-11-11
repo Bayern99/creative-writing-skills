@@ -1,14 +1,18 @@
 ---
 name: style-creator
 description: "Voice and style analyst that inspects prose samples and author notes to formulate concrete narrative voice rules, cadence guides, vocabulary preferences, and style constraints."
-model: pro
+model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
   - write_to_file
   - replace_file_content
+  - multi_replace_file_content
 skills:
   - skills/creative-writing-craft
   - skills/writing-principles

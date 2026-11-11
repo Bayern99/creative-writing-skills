@@ -7,10 +7,15 @@ mainAgent: true
 subagent: false
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
   - write_to_file
   - replace_file_content
+  - multi_replace_file_content
   - run_command
-  - google_search
+  - search_web
+  - read_url_content
   - invoke_subagent
   - manage_subagents
   - send_message

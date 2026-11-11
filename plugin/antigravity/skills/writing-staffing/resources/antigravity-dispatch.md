@@ -7,38 +7,27 @@ In Google Antigravity 2.0, multi-agent orchestration is managed via native agent
 ## 1. Architectural Topology: Hub-and-Spoke
 
 The system operates as a tiered hub-and-spoke hierarchy:
-- **`muse`** sits at the center as the author-facing orchestrator (`model: inherit`, `mainAgent: true`, `subagent: false`).
+- **`muse`** sits at the center as the author-facing orchestrator (`model: inherit`, `mainAgent: true`, `subagent: false`). Muse owns creative direction, subagent orchestration, synthesis, and final quality verdicts.
 - **Producer lanes** (`writer`, `outliner`, `brainstormer`, `style-creator`) generate material.
 - **Reviewer lanes** (`critic`, `continuity-checker`, `reader-sim`, `cold-reader`) evaluate material objectively.
-- **Sub-orchestrator** `kb-lead` manages knowledge capture lanes (`explorer`, `session-miner`, `kb-maintainer`).
+- **Research & Simulation lanes** (`creative-researcher`, `character-sim`) provide factual grounding and interactive dialogue testing.
+- **Sub-orchestrator** `kb-lead` manages knowledge capture lanes (`explorer`, `session-miner`, `cold-reader`, `kb-maintainer`).
 
 ---
 
 ## 2. Model Tier Allocation
 
-Subagents are assigned model tiers based on cognitive demands, balancing creative depth with operational velocity:
-- **Deep Creative & Critical Reasoning (`model: pro`)**:
-  - `writer`: Rich narrative prose, voice maintenance, and nuanced line polishing.
-  - `critic`: Rigorous adversarial diagnosis across structural pacing, character agency, and prose cadence.
-  - `outliner`: Structural story architecture, thematic pacing, and chapter beat sheets.
-  - `style-creator`: Linguistic voice analysis, stylistic rule extraction, and constraint design.
-  - `kb-lead`: High-level taxonomy design, knowledge curation, and triage of durable canon.
-- **High-Velocity Audit, Research & Simulation (`model: flash`)**:
-  - `creative-researcher`: Rapid web research, historical context, and sensory detail gathering.
-  - `continuity-checker`: Fact-checking and timeline verification against canon in `kb/`.
-  - `reader-sim`: First-pass experiential reader reactions and emotional tracking.
-  - `character-sim`: Fast, responsive in-character dialogue stress-testing.
-  - `brainstormer`: Divergent narrative options and lateral brainstorming.
-  - `explorer`, `session-miner`, `cold-reader`, `kb-maintainer`: Fast transcript parsing, reference searching, and markdown maintenance.
-- **Primary Orchestrator (`muse`)**:
-  - `model: inherit`: Inherits the author's primary conversation model in Antigravity Desktop or CLI.
+- **`muse` (`model: inherit`)**: Inherits the author's chosen session model in Antigravity Desktop or CLI, owning creative direction, orchestration, result integration, and final quality judgment.
+- **All 14 Subagents (`model: flash`)**: Configured uniformly to `model: flash` (Gemini 3.8 Flash) for fast, high-throughput parallel execution across all specialist lanes (`writer`, `critic`, `outliner`, `style-creator`, `kb-lead`, `creative-researcher`, `continuity-checker`, `reader-sim`, `character-sim`, `brainstormer`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer`).
+- **Role Differentiation**: Specialist independence comes from dedicated system prompts, explicit least-privilege `tools` allowlists, and targeted craft skill bundles.
 
 ---
 
 ## 3. Dispatching Subagents with `invoke_subagent`
 
 ### Native Call Schema
-Antigravity's native `invoke_subagent` tool accepts an array of subagent specifications under `Subagents`, each specifying `TypeName`, `Role`, `Prompt`, and optional `Model` and `Workspace`:
+Per the official Antigravity Hooks and Subagents documentation, `invoke_subagent` accepts a `Subagents` array where each entry defines `TypeName`, `Role`, `Prompt`, and optional `Workspace` (`inherit`, `branch`, or `share`).
+*(Note: Each subagent's model tier is governed by its frontmatter `model: flash` declaration; whether a runtime per-call `Model` override parameter is honored by all CLI/Desktop versions is not explicitly specified in the public Hooks schema, so rely on the agent frontmatter rather than passing `Model` in the call payload.)*
 
 ### Parallel Review Lanes
 When a draft is ready for review, `muse` spawns multiple review lanes concurrently in a single tool call:
@@ -50,19 +39,19 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
       "TypeName": "critic",
       "Role": "Adversarial Draft Critic",
       "Prompt": "Diagnose chapter 3 draft at work/drafts/ch03.md for emotional pacing and narrative tension. Return anchored findings.",
-      "Model": "pro"
+      "Workspace": "inherit"
     },
     {
       "TypeName": "continuity-checker",
       "Role": "Canon Continuity Auditor",
       "Prompt": "Cross-reference chapter 3 draft at work/drafts/ch03.md against kb/timeline/timeline.md and kb/characters/alyssa.md. Flag any chronological or state contradictions.",
-      "Model": "flash"
+      "Workspace": "inherit"
     },
     {
       "TypeName": "reader-sim",
       "Role": "Experiential Reader Reaction",
       "Prompt": "Perform an experiential cold read of work/drafts/ch03.md as a first-time fantasy reader. Record moment-by-moment emotional turns and confusions.",
-      "Model": "flash"
+      "Workspace": "inherit"
     }
   ]
 }
@@ -73,7 +62,7 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
 ## 4. Multi-Turn Stateful Iteration vs. Fresh Cold Reads
 
 ### A. Stateful Producer Iteration (`writer`)
-- The `writer` subagent maintains conversation history and context while idle.
+- The `writer` subagent maintains conversation history and context while in the `idle` state.
 - When `muse` receives feedback or revisions from the author, do NOT spawn a new `writer`.
 - Instead, use `send_message` with the existing `writer` subagent conversation ID:
   ```json
@@ -92,7 +81,7 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
 
 ## 5. Nested Delegation (`kb-lead`)
 
-`muse` does not need to micro-manage documentation refactoring. Instead:
+`muse` delegates knowledge base curation to `kb-lead`:
 1. `muse` invokes `kb-lead`:
    ```json
    {
@@ -101,12 +90,12 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
          "TypeName": "kb-lead",
          "Role": "KB Lead: Chapter 3 Capture",
          "Prompt": "Update the knowledge base following completion of Chapter 3. Extract newly confirmed facts about the citadel into kb/world/locations.md.",
-         "Model": "pro"
+         "Workspace": "inherit"
        }
      ]
    }
    ```
-2. `kb-lead` in turn invokes `session-miner` to inspect conversation transcripts or `explorer` to check references, and delegates file updates to `kb-maintainer`.
+2. `kb-lead` is equipped with `invoke_subagent`, `manage_subagents`, and `send_message` (up to Antigravity's 10-level nesting limit) to spawn `session-miner`, `explorer`, `cold-reader`, and `kb-maintainer`, and commits the updated knowledge base tree.
 
 ---
 
@@ -114,7 +103,7 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
 
 Manage active background subagents when needed:
 - **`list`**: Enumerate all active direct subagents with their conversation IDs and lifecycle state (`running`, `idle`, etc.).
-- **`kill`**: Terminate specific subagents by conversation ID when a lane is cancelled or superseded.
-- **`kill_all`**: Cleanly terminate all active subagent child processes.
+- **`kill`**: Terminate specific subagents by passing `ConversationIds` when a lane is cancelled or superseded.
+- **`kill_all`**: Cleanly terminate all active subagents and their descendants.
 
 Subagents report their results asynchronously back to the calling agent. Allow subagents to finish and synthesize the aggregated findings before presenting prioritized choices to the author.

@@ -7,6 +7,9 @@ mainAgent: false
 subagent: true
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
 skills:
   - skills/story-review
   - skills/md-validation

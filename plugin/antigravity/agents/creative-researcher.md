@@ -7,7 +7,11 @@ mainAgent: false
 subagent: true
 tools:
   - view_file
-  - google_search
+  - list_dir
+  - find_by_name
+  - grep_search
+  - search_web
+  - read_url_content
 skills:
   - skills/creative-research
 ---

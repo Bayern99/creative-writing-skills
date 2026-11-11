@@ -278,15 +278,14 @@ class Checker:
             if not fm.get("description"):
                 self.error(f"Agent {agent_name}: missing or empty description")
 
-            # Model policy: muse = inherit, subagents match agents.toml
+            # Model policy: muse = inherit, all 14 subagents = flash
             model = fm.get("model")
-            expected_model = expected_agents_table.get(agent_name, {}).get("model", default_model)
             if agent_name == "muse":
                 if model != "inherit":
                     self.error(f"Agent muse: model must be 'inherit', got '{model}'")
             else:
-                if model != expected_model:
-                    self.error(f"Subagent {agent_name}: model expected '{expected_model}', got '{model}'")
+                if model != "flash":
+                    self.error(f"Subagent {agent_name}: model must be 'flash', got '{model}'")
 
             # Tools permission whitelist validation
             tools = fm.get("tools")
@@ -296,11 +295,21 @@ class Checker:
                 else:
                     valid_tools = {
                         "view_file",
+                        "list_dir",
+                        "find_by_name",
+                        "grep_search",
                         "write_to_file",
                         "replace_file_content",
+                        "multi_replace_file_content",
                         "run_command",
-                        "google_search",
+                        "manage_task",
+                        "schedule",
+                        "list_permissions",
+                        "ask_permission",
+                        "search_web",
+                        "read_url_content",
                         "invoke_subagent",
+                        "define_subagent",
                         "manage_subagents",
                         "send_message",
                         "ask_question",
@@ -311,9 +320,10 @@ class Checker:
                         self.error(f"Agent {agent_name}: contains unknown tools {unknown_tools}")
 
                     if agent_name in REVIEWER_AGENTS:
-                        destructive = set(tools) & {"write_to_file", "replace_file_content", "run_command"}
+                        destructive = set(tools) & {"write_to_file", "replace_file_content", "multi_replace_file_content", "run_command"}
                         if destructive:
                             self.error(f"Reviewer agent {agent_name}: must be strictly read-only, but declares edit/run tools {destructive}")
+
 
             # Execution policy
             policy = fm.get("commandExecutionPolicy")

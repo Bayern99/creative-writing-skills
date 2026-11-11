@@ -373,25 +373,23 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             f"User Directive Violation: muse model must be 'inherit', got '{muse_cfg.get('model')}'.",
         )
 
-    def test_t1_09_subagents_model_tiers(self):
-        """Model tiers: pro for creative/critical depth, flash for research/sim/audit."""
+    def test_t1_09_all_subagents_model_is_flash(self):
+        """User Directive: all 14 subagents must be configured to 'flash'."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         defaults = config.get("defaults", {})
         default_model = defaults.get("model")
         agents_table = config.get("agents", {})
-        expected_pro = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
 
         for name in EXPECTED_AGENTS:
             if name == "muse":
                 continue
             agent_cfg = agents_table.get(name, {})
             model = agent_cfg.get("model", default_model)
-            expected = "pro" if name in expected_pro else "flash"
             self.assertEqual(
                 model,
-                expected,
-                f"Model tier violation: subagent '{name}' must have model '{expected}', got '{model}'.",
+                "flash",
+                f"User Directive Violation: subagent '{name}' must have model 'flash', got '{model}'.",
             )
 
 

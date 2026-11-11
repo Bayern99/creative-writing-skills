@@ -1,16 +1,22 @@
 ---
 name: kb-lead
 description: "Sub-orchestrator managing the story knowledge base (kb/). Spawns explorer, session-miner, cold-reader, and kb-maintainer to distill decisions into durable canonical documentation."
-model: pro
+model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
   - write_to_file
   - replace_file_content
+  - multi_replace_file_content
+  - run_command
   - invoke_subagent
   - manage_subagents
+  - send_message
 skills:
   - skills/shared-dao
   - skills/knowledge-layers

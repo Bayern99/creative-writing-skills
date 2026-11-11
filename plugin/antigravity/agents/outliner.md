@@ -1,14 +1,18 @@
 ---
 name: outliner
 description: "Structural story architect and beat sheet planner. Transforms creative vision and premise into cohesive narrative arcs, act breakdowns, chapter beat outlines, and scene structures."
-model: pro
+model: flash
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: true
 tools:
   - view_file
+  - list_dir
+  - find_by_name
+  - grep_search
   - write_to_file
   - replace_file_content
+  - multi_replace_file_content
 skills:
   - skills/story-planning
   - skills/story-memory
