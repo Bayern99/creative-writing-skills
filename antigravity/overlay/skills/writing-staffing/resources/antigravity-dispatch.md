@@ -16,38 +16,53 @@ The system operates as a tiered hub-and-spoke hierarchy:
 
 ## 2. Model Tier Allocation
 
-All 14 subagents are configured to `model: flash` (Gemini 3.8 Flash):
-- **Why**: Gemini 3.8 Flash provides fast, cost-effective, high-throughput execution across parallel lanes.
-- **Differentiation**: Instead of relying on disparate third-party model families, lane independence is achieved through:
-  1. Distinct system instructions and craft principles.
-  2. Targeted skill bundles (e.g., `md-validation` for `continuity-checker`, `reader-sim` for naive reaction).
-  3. Strict behavioral contracts (read-only for reviewers; no direct user prompt for subagents).
-- **Muse**: Inherits the author's primary conversation model (`model: inherit`), allowing authors to choose their preferred model in the Antigravity Desktop App or CLI.
+Subagents are assigned model tiers based on cognitive demands, balancing creative depth with operational velocity:
+- **Deep Creative & Critical Reasoning (`model: pro`)**:
+  - `writer`: Rich narrative prose, voice maintenance, and nuanced line polishing.
+  - `critic`: Rigorous adversarial diagnosis across structural pacing, character agency, and prose cadence.
+  - `outliner`: Structural story architecture, thematic pacing, and chapter beat sheets.
+  - `style-creator`: Linguistic voice analysis, stylistic rule extraction, and constraint design.
+  - `kb-lead`: High-level taxonomy design, knowledge curation, and triage of durable canon.
+- **High-Velocity Audit, Research & Simulation (`model: flash`)**:
+  - `creative-researcher`: Rapid web research, historical context, and sensory detail gathering.
+  - `continuity-checker`: Fact-checking and timeline verification against canon in `kb/`.
+  - `reader-sim`: First-pass experiential reader reactions and emotional tracking.
+  - `character-sim`: Fast, responsive in-character dialogue stress-testing.
+  - `brainstormer`: Divergent narrative options and lateral brainstorming.
+  - `explorer`, `session-miner`, `cold-reader`, `kb-maintainer`: Fast transcript parsing, reference searching, and markdown maintenance.
+- **Primary Orchestrator (`muse`)**:
+  - `model: inherit`: Inherits the author's primary conversation model in Antigravity Desktop or CLI.
 
 ---
 
 ## 3. Dispatching Subagents with `invoke_subagent`
 
+### Native Call Schema
+Antigravity's native `invoke_subagent` tool accepts an array of subagent specifications under `Subagents`, each specifying `TypeName`, `Role`, `Prompt`, and optional `Model` and `Workspace`:
+
 ### Parallel Review Lanes
-When a draft is ready for review, `muse` spawns multiple review lanes in a single invocation to run concurrently:
+When a draft is ready for review, `muse` spawns multiple review lanes concurrently in a single tool call:
 
 ```json
 {
-  "subagents": [
+  "Subagents": [
     {
-      "agentName": "critic",
-      "instruction": "Diagnose chapter 3 draft at work/drafts/ch03.md for emotional pacing and narrative tension. Return anchored findings.",
-      "title": "Critic: Tension and Pacing"
+      "TypeName": "critic",
+      "Role": "Adversarial Draft Critic",
+      "Prompt": "Diagnose chapter 3 draft at work/drafts/ch03.md for emotional pacing and narrative tension. Return anchored findings.",
+      "Model": "pro"
     },
     {
-      "agentName": "continuity-checker",
-      "instruction": "Cross-reference chapter 3 draft at work/drafts/ch03.md against kb/timeline/timeline.md and kb/characters/alyssa.md. Flag any chronological or state contradictions.",
-      "title": "Continuity: Alyssa State & Timeline"
+      "TypeName": "continuity-checker",
+      "Role": "Canon Continuity Auditor",
+      "Prompt": "Cross-reference chapter 3 draft at work/drafts/ch03.md against kb/timeline/timeline.md and kb/characters/alyssa.md. Flag any chronological or state contradictions.",
+      "Model": "flash"
     },
     {
-      "agentName": "reader-sim",
-      "instruction": "Perform an experiential cold read of work/drafts/ch03.md as a first-time fantasy reader. Record moment-by-moment emotional turns and confusions.",
-      "title": "Reader Sim: First Read"
+      "TypeName": "reader-sim",
+      "Role": "Experiential Reader Reaction",
+      "Prompt": "Perform an experiential cold read of work/drafts/ch03.md as a first-time fantasy reader. Record moment-by-moment emotional turns and confusions.",
+      "Model": "flash"
     }
   ]
 }
@@ -81,24 +96,25 @@ When a draft is ready for review, `muse` spawns multiple review lanes in a singl
 1. `muse` invokes `kb-lead`:
    ```json
    {
-     "subagents": [
+     "Subagents": [
        {
-         "agentName": "kb-lead",
-         "instruction": "Update the knowledge base following completion of Chapter 3. Extract newly confirmed facts about the citadel into kb/world/locations.md.",
-         "title": "KB Lead: Chapter 3 Capture"
+         "TypeName": "kb-lead",
+         "Role": "KB Lead: Chapter 3 Capture",
+         "Prompt": "Update the knowledge base following completion of Chapter 3. Extract newly confirmed facts about the citadel into kb/world/locations.md.",
+         "Model": "pro"
        }
      ]
    }
    ```
-2. `kb-lead` in turn invokes `session-miner` to inspect conversation transcripts or `explorer` to check references, and applies clean updates to `kb/`.
+2. `kb-lead` in turn invokes `session-miner` to inspect conversation transcripts or `explorer` to check references, and delegates file updates to `kb-maintainer`.
 
 ---
 
 ## 6. Lifecycle Management with `manage_subagents`
 
-Monitor and clean up running subagents:
-- **`list`**: View all active and completed subagent conversations.
-- **`status`**: Check execution status and retrieve output logs.
-- **`kill`**: Terminate runaway or stuck subagents.
+Manage active background subagents when needed:
+- **`list`**: Enumerate all active direct subagents with their conversation IDs and lifecycle state (`running`, `idle`, etc.).
+- **`kill`**: Terminate specific subagents by conversation ID when a lane is cancelled or superseded.
+- **`kill_all`**: Cleanly terminate all active subagent child processes.
 
-Always allow subagents to finish and report results cleanly before synthesizing next steps for the author.
+Subagents report their results asynchronously back to the calling agent. Allow subagents to finish and synthesize the aggregated findings before presenting prioritized choices to the author.

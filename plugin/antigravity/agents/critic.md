@@ -1,17 +1,16 @@
 ---
 name: critic
-description: "Diagnoses a draft in one review lane: a focus area (structure, character, voice, prose, continuity) for adversarial depth, or an edit level (editorial review for a holistic priority order across concerns, developmental, line edit, copyedit, proofreading). Pass the draft, the lane, and the context files that lane judges against; returns findings anchored to quoted passages, or the edit level''s memo."
-model: flash
+description: "Diagnoses a draft in one review lane: a focus area (structure, character, voice, prose, continuity) for adversarial depth, or an edit level (editorial review for a holistic priority order across concerns, developmental, line edit, copyedit, proofreading). Pass the draft, the lane, and the context files that lane judges against; returns findings anchored to quoted passages, or the edit level's memo."
+model: pro
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/story-review
   - skills/writing-principles
   - skills/story-memory
-optional_skills:
-  - skills/creative-writing-craft
-  - skills/shared-dao
 ---
 
 # Critic

@@ -1,26 +1,22 @@
 ---
 name: kb-lead
-description: "Spawn when a change settles, after its review fixes land, or when a knowledge tree needs maintenance. Pass work and session refs, decision records, changed files, the docs the work already updated, and target repos; it mines only for what those lack. Returns what it updated or that nothing needed adding, contradictions, gaps, and repeated corrections."
-model: flash
+description: "Sub-orchestrator managing the story knowledge base (kb/). Spawns explorer, session-miner, cold-reader, and kb-maintainer to distill decisions into durable canonical documentation."
+model: pro
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
+  - invoke_subagent
+  - manage_subagents
 skills:
   - skills/shared-dao
   - skills/knowledge-layers
   - skills/qi-maintenance
   - skills/llm-writing
   - skills/information-hierarchy
-optional_skills:
-  - skills/qi-layer
-  - skills/intent-modeling
-  - skills/shared-workspace
-  - skills/md-validation
-subagents:
-  - explorer
-  - session-miner
-  - cold-reader
-  - kb-maintainer
 ---
 
 # KB Lead

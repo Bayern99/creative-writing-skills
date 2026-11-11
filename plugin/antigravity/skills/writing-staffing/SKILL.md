@@ -18,7 +18,7 @@ The files each kind of work needs are in `/story-memory`
 
 In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
 
-By default, all subagents run on `model: flash` (Gemini 3.8 Flash), achieving differentiation through their distinct System Prompts and specialized skills. The main agent `muse` runs on `model: inherit` (inheriting your chosen model in the App/CLI).
+Deep creative drafting and critique subagents (`writer`, `critic`, `outliner`, `style-creator`, `kb-lead`) run on `model: pro` (Gemini 3.8 Pro). Fast simulation, research, and audit sweeps (`creative-researcher`, `continuity-checker`, `reader-sim`, `character-sim`, `brainstormer`, `explorer`, `session-miner`, `cold-reader`, `kb-maintainer`) run on `model: flash` (Gemini 3.8 Flash). The main orchestrator `muse` runs on `model: inherit` (inheriting your chosen model in the App/CLI).
 
 **Parallel lanes**: In `invoke_subagent`, you can pass multiple subagent definitions in a single call (e.g. structure, voice, and character critics) to run concurrently.
 

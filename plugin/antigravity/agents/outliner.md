@@ -1,10 +1,14 @@
 ---
 name: outliner
-description: "Turns confirmed direction into saga, arc, chapter, scene, or beat outlines a writer can draft from. Pass the confirmed direction, existing outlines, character state, timeline and prior chapters; writes outlines to the work directory and returns their paths and the open structural questions."
-model: flash
+description: "Structural story architect and beat sheet planner. Transforms creative vision and premise into cohesive narrative arcs, act breakdowns, chapter beat outlines, and scene structures."
+model: pro
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: true
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
 skills:
   - skills/story-planning
   - skills/story-memory

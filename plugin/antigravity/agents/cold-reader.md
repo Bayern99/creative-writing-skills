@@ -1,15 +1,14 @@
 ---
 name: cold-reader
-description: "Spawn to check text that outlives the work (KB pages, AGENTS.md, docs, PR bodies, prompts) for what a reader who wasn''t there can''t follow. Pass only the paths and who reads each one: no summary of the work, no reasons for the changes, and no labels from it, even as examples. Returns each place the reader stalls, quoted, with what that reader would need; edits nothing."
+description: "Blind reader audit for story documentation. Inspects knowledge base pages and outlines without author bias to flag unclear context, jargon, or missing antecedents."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/llm-writing
-optional_skills:
-  - skills/intent-modeling
-  - skills/information-hierarchy
 ---
 
 # Cold Reader

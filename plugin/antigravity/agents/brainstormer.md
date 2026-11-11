@@ -1,10 +1,14 @@
 ---
 name: brainstormer
-description: "Generates distinct options on one scoped question or angle for the author to choose from; run several on different angles. Pass the question, the constraints and established context, and what has been rejected; writes a tagged brainstorm file and returns the need it read, the options with tradeoffs, and open questions."
+description: "Divergent ideation engine for story development. Proposes distinct narrative directions, thematic angles, and plot alternatives with explicit trade-offs for author selection."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
 skills:
   - skills/story-planning
   - skills/story-memory

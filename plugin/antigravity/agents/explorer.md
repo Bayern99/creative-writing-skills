@@ -1,10 +1,12 @@
 ---
 name: explorer
-description: "Delegate for multi-file exploration of a project's files and history; spawn @explorer instead of reading broadly yourself. Pass the question; returns the facts with file paths, line references, and snippets in its report. Writes no files."
+description: "Story lore and knowledge base explorer. Performs deep read sweeps across project files, canon documents, and character files to answer story questions without editing files."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 ---
 
 # Explorer

@@ -1,16 +1,18 @@
 ---
 name: style-creator
-description: "Analyzes prose samples into style reference files for the project's voice. Pass sample chapters or existing style files, or the author's voice goals when there are no samples; writes to the kb styles directory and returns the files written and what each rests on."
-model: flash
+description: "Voice and style analyst that inspects prose samples and author notes to formulate concrete narrative voice rules, cadence guides, vocabulary preferences, and style constraints."
+model: pro
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
 skills:
   - skills/creative-writing-craft
   - skills/writing-principles
   - skills/llm-writing
-optional_skills:
-  - skills/story-memory
 ---
 
 # Style Creator

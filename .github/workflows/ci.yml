@@ -98,6 +98,12 @@ jobs:
       - name: Run 4-Tier E2E test suite
         run: python3 tests/e2e_antigravity_test.py
 
+      - name: Run adversarial test suite
+        run: python3 tests/test_m1_adversarial.py
+
+      - name: Run delegation flow test suite
+        run: python3 tests/test_delegation_flow.py
+
       - name: Validate Antigravity plugin with agy CLI
         run: |
           if command -v agy >/dev/null 2>&1; then

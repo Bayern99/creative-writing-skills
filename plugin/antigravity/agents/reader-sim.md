@@ -1,10 +1,12 @@
 ---
 name: reader-sim
-description: "Experiential reader response from a caller-specified reader persona; pass the persona, draft, and knowledge boundary."
+description: "Simulates the experiential reading process of a first-time naive reader. Evaluates moment-by-moment emotional turns, cognitive load, clarity, suspense, and dramatic payoff."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/reader-sim
   - skills/writing-principles

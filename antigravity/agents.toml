@@ -13,6 +13,17 @@ mainAgent = true
 subagent = false
 role = "orchestrator"
 description = "Author-facing creative partner for all story work: talks through the story, plans and drafts it with the author, spawns critique, continuity, reader-sim, research and knowledge-capture lanes, and owns the verdict on each draft. Select as your main agent for story sessions."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+  "run_command",
+  "google_search",
+  "invoke_subagent",
+  "manage_subagents",
+  "send_message",
+  "ask_question",
+]
 skills = [
   "skills/creative-writing-muse",
   "skills/story-workflow",
@@ -23,15 +34,6 @@ skills = [
   "skills/intent-modeling",
   "skills/llm-writing",
   "skills/writing-staffing",
-]
-optional_skills = [
-  "skills/story-review",
-  "skills/reader-sim",
-  "skills/character-sim",
-  "skills/creative-research",
-  "skills/shared-dao",
-  "skills/grill-with-docs",
-  "skills/structured-artifact",
 ]
 subagents = [
   "brainstormer",
@@ -51,19 +53,69 @@ subagents = [
 ]
 
 [agents.writer]
-model = "flash"
+model = "pro"
 mainAgent = true
 subagent = true
 role = "producer"
+description = "Writes production prose in one mode: fresh draft, revision, bridge, alternate take, or line polish. Pass the brief or revision notes, the mode, the target path, and the style, character-state and canon files; returns the mode used, the judgment calls it made, and any contradiction with character state."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+]
 skills = [
   "skills/creative-writing-craft",
   "skills/writing-principles",
   "skills/story-memory",
 ]
-optional_skills = [
+
+[agents.critic]
+model = "pro"
+mainAgent = false
+subagent = true
+role = "reviewer"
+description = "Diagnoses a draft in one review lane: a focus area (structure, character, voice, prose, continuity) for adversarial depth, or an edit level (editorial review for a holistic priority order across concerns, developmental, line edit, copyedit, proofreading). Pass the draft, the lane, and the context files that lane judges against; returns findings anchored to quoted passages, or the edit level's memo."
+tools = [
+  "view_file",
+]
+skills = [
   "skills/story-review",
-  "skills/character-sim",
-  "skills/shared-dao",
+  "skills/writing-principles",
+  "skills/story-memory",
+]
+
+[agents.outliner]
+model = "pro"
+mainAgent = true
+subagent = true
+role = "planner"
+description = "Structural story architect and beat sheet planner. Transforms creative vision and premise into cohesive narrative arcs, act breakdowns, chapter beat outlines, and scene structures."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+]
+skills = [
+  "skills/story-planning",
+  "skills/story-memory",
+  "skills/md-validation",
+]
+
+[agents.style-creator]
+model = "pro"
+mainAgent = false
+subagent = true
+role = "producer"
+description = "Voice and style analyst that inspects prose samples and author notes to formulate concrete narrative voice rules, cadence guides, vocabulary preferences, and style constraints."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+]
+skills = [
+  "skills/creative-writing-craft",
+  "skills/writing-principles",
+  "skills/llm-writing",
 ]
 
 [agents.character-sim]
@@ -71,39 +123,14 @@ model = "flash"
 mainAgent = true
 subagent = true
 role = "simulator"
+description = "In-character dialogue and psychological simulation partner. Adopts character voice, motivations, knowledge boundaries, and emotional state to test scenes and authentic dialogue."
+tools = [
+  "view_file",
+]
 skills = [
   "skills/character-sim",
   "skills/writing-principles",
   "skills/llm-writing",
-]
-optional_skills = [
-  "skills/story-memory",
-]
-
-[agents.outliner]
-model = "flash"
-mainAgent = true
-subagent = true
-role = "planner"
-skills = [
-  "skills/story-planning",
-  "skills/story-memory",
-  "skills/md-validation",
-]
-
-[agents.critic]
-model = "flash"
-mainAgent = false
-subagent = true
-role = "reviewer"
-skills = [
-  "skills/story-review",
-  "skills/writing-principles",
-  "skills/story-memory",
-]
-optional_skills = [
-  "skills/creative-writing-craft",
-  "skills/shared-dao",
 ]
 
 [agents.brainstormer]
@@ -111,6 +138,12 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "producer"
+description = "Divergent ideation engine for story development. Proposes distinct narrative directions, thematic angles, and plot alternatives with explicit trade-offs for author selection."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+]
 skills = [
   "skills/story-planning",
   "skills/story-memory",
@@ -123,6 +156,10 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
+description = "Cross-references drafts against established project canon, character state sheets, world rules, and timeline in kb/. Flags contradictions, chronological slips, and state leaks."
+tools = [
+  "view_file",
+]
 skills = [
   "skills/story-review",
   "skills/md-validation",
@@ -135,24 +172,14 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
+description = "Simulates the experiential reading process of a first-time naive reader. Evaluates moment-by-moment emotional turns, cognitive load, clarity, suspense, and dramatic payoff."
+tools = [
+  "view_file",
+]
 skills = [
   "skills/reader-sim",
   "skills/writing-principles",
   "skills/llm-writing",
-]
-
-[agents.style-creator]
-model = "flash"
-mainAgent = false
-subagent = true
-role = "producer"
-skills = [
-  "skills/creative-writing-craft",
-  "skills/writing-principles",
-  "skills/llm-writing",
-]
-optional_skills = [
-  "skills/story-memory",
 ]
 
 [agents.creative-researcher]
@@ -160,27 +187,34 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "researcher"
+description = "Web research for fiction and worldbuilding — primary sources, historical and cultural details, domain expertise, sensory references, and authentic real-world analogues."
+tools = [
+  "view_file",
+  "google_search",
+]
 skills = [
   "skills/creative-research",
 ]
 
 [agents.kb-lead]
-model = "flash"
+model = "pro"
 mainAgent = false
 subagent = true
 role = "lead"
+description = "Sub-orchestrator managing the story knowledge base (kb/). Spawns explorer, session-miner, cold-reader, and kb-maintainer to distill decisions into durable canonical documentation."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+  "invoke_subagent",
+  "manage_subagents",
+]
 skills = [
   "skills/shared-dao",
   "skills/knowledge-layers",
   "skills/qi-maintenance",
   "skills/llm-writing",
   "skills/information-hierarchy",
-]
-optional_skills = [
-  "skills/qi-layer",
-  "skills/intent-modeling",
-  "skills/shared-workspace",
-  "skills/md-validation",
 ]
 subagents = [
   "explorer",
@@ -194,6 +228,10 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
+description = "Story lore and knowledge base explorer. Performs deep read sweeps across project files, canon documents, and character files to answer story questions without editing files."
+tools = [
+  "view_file",
+]
 skills = []
 
 [agents.session-miner]
@@ -201,11 +239,12 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
+description = "Session transcript miner that extracts author decisions, rejected narrative paths, confirmed facts, and intent from chat history for knowledge base curation."
+tools = [
+  "view_file",
+]
 skills = [
   "skills/intent-modeling",
-]
-optional_skills = [
-  "skills/llm-writing",
 ]
 
 [agents.cold-reader]
@@ -213,12 +252,12 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
+description = "Blind reader audit for story documentation. Inspects knowledge base pages and outlines without author bias to flag unclear context, jargon, or missing antecedents."
+tools = [
+  "view_file",
+]
 skills = [
   "skills/llm-writing",
-]
-optional_skills = [
-  "skills/intent-modeling",
-  "skills/information-hierarchy",
 ]
 
 [agents.kb-maintainer]
@@ -226,6 +265,12 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "maintainer"
+description = "Knowledge base refactoring and structural maintenance agent. Validates markdown link integrity, reorganizes directory hierarchy, and formats documentation."
+tools = [
+  "view_file",
+  "write_to_file",
+  "replace_file_content",
+]
 skills = [
   "skills/shared-dao",
   "skills/shared-workspace",

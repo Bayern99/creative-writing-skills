@@ -1,10 +1,12 @@
 ---
 name: continuity-checker
-description: "Cross-references a draft against canon, timeline, character state, recorded decisions and story vocabulary for factual contradictions, reading across the project rather than one focus. Pass the draft and the canon files it touches; returns each contradiction with its evidence and severity."
+description: "Cross-references drafts against established project canon, character state sheets, world rules, and timeline in kb/. Flags contradictions, chronological slips, and state leaks."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/story-review
   - skills/md-validation

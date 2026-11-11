@@ -1,10 +1,14 @@
 ---
 name: kb-maintainer
-description: "Spawn to refactor a documentation tree''s structure (KB, .context/, docs/, design/): pass the target root. Splits, merges, renames, and repairs cross-references; returns changed paths and flagged content issues. Never decides content truth."
+description: "Knowledge base refactoring and structural maintenance agent. Validates markdown link integrity, reorganizes directory hierarchy, and formats documentation."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
 skills:
   - skills/shared-dao
   - skills/shared-workspace

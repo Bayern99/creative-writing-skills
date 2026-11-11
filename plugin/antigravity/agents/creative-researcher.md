@@ -1,10 +1,13 @@
 ---
 name: creative-researcher
-description: "Web research for fiction — primary sources, reference works, cultural detail, domain expertise, and community discussion."
+description: "Web research for fiction and worldbuilding — primary sources, historical and cultural details, domain expertise, sensory references, and authentic real-world analogues."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
+  - google_search
 skills:
   - skills/creative-research
 ---

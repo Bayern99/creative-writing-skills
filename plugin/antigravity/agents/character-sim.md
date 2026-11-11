@@ -1,16 +1,16 @@
 ---
 name: character-sim
-description: "In-character conversation for voice discovery and relationship testing. Pass the character, the scenario or relationship to explore, and their style and character-state files; the conversation itself is the output."
+description: "In-character dialogue and psychological simulation partner. Adopts character voice, motivations, knowledge boundaries, and emotional state to test scenes and authentic dialogue."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/character-sim
   - skills/writing-principles
   - skills/llm-writing
-optional_skills:
-  - skills/story-memory
 ---
 
 # Character Simulation

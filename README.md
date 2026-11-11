@@ -46,7 +46,7 @@ agy plugin install ./plugin/antigravity
 
 Or install directly via GitHub subpath URL:
 ```bash
-agy plugin install https://github.com/haowjy/creative-writing-skills/tree/main/plugin/antigravity
+agy plugin install https://github.com/Bayern99/creative-writing-skills/tree/antigravity-plugin/plugin/antigravity
 ```
 
 Once installed, verify discovery with:

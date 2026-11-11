@@ -331,17 +331,39 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
             f"User directive violation: muse model must be 'inherit', found '{muse.get('model')}'"
         )
 
-    def test_all_14_subagents_are_strictly_flash(self):
+    def test_subagents_model_tiers(self):
+        """Subagents are allocated 'pro' (deep reasoning/creative craft) or 'flash' (audit/sim/research)."""
+        expected_pro = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
         agents = self.config["agents"]
         for name, cfg in agents.items():
             if name == "muse":
                 continue
             model = cfg.get("model", self.config.get("defaults", {}).get("model"))
-            self.assertEqual(
-                model,
-                "flash",
-                f"User directive violation: agent '{name}' model must be 'flash', found '{model}'"
-            )
+            if name in expected_pro:
+                self.assertEqual(
+                    model,
+                    "pro",
+                    f"Agent '{name}' expected model 'pro' for creative depth, found '{model}'"
+                )
+            else:
+                self.assertEqual(
+                    model,
+                    "flash",
+                    f"Agent '{name}' expected model 'flash' for high-throughput efficiency, found '{model}'"
+                )
+
+    def test_agent_tools_allowlists(self):
+        """Verify all agents define tools allowlists with least privilege enforcement."""
+        reviewers = {"critic", "character-sim", "continuity-checker", "reader-sim", "explorer", "session-miner", "cold-reader"}
+        agents = self.config["agents"]
+        for name, cfg in agents.items():
+            tools = cfg.get("tools", [])
+            self.assertIsInstance(tools, list, f"Agent '{name}' tools must be a list")
+            self.assertGreater(len(tools), 0, f"Agent '{name}' tools list must not be empty")
+            if name in reviewers:
+                for forbidden in ("write_to_file", "replace_file_content", "run_command"):
+                    self.assertNotIn(forbidden, tools, f"Reviewer agent '{name}' cannot have edit/run tool '{forbidden}'")
+
 
     def test_main_agent_flags(self):
         """Only muse, writer, character-sim, outliner may have mainAgent: true."""

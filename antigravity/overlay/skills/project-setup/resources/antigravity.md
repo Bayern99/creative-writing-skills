@@ -12,7 +12,7 @@ agy plugin install /path/to/creative-writing-skills/plugin/antigravity
 
 Or install directly from the GitHub repository tree URL:
 ```bash
-agy plugin install https://github.com/haowjy/creative-writing-skills/tree/main/plugin/antigravity
+agy plugin install https://github.com/Bayern99/creative-writing-skills/tree/antigravity-plugin/plugin/antigravity
 ```
 
 Verify installation:

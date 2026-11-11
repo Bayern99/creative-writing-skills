@@ -15,7 +15,8 @@ The `creative-writing-skills` plugin turns Google Antigravity into a dedicated c
 - **Native Antigravity Multi-Agent Architecture**: Built specifically for Antigravity's `invoke_subagent` and `send_message` capabilities.
 - **Optimized Model Strategy**:
   - **Muse (`model: inherit`)**: Operates on the model you select in Antigravity Desktop or CLI.
-  - **14 Specialized Subagents (`model: flash`)**: Fast, high-throughput execution on Gemini 3.8 Flash, with role specialization driven by focused system instructions and tailored skill bundles.
+  - **Deep Creative & Critical Reasoning (`model: pro`)**: High-tier Gemini 3.8 Pro allocation for `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead`, ensuring rich prose cadence, rigorous structural critique, and architectural planning.
+  - **High-Velocity Simulation & Research (`model: flash`)**: Fast, cost-efficient Gemini 3.8 Flash execution for `creative-researcher`, `continuity-checker`, `reader-sim`, `character-sim`, `brainstormer`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer`.
 - **Safety First**: Integrated `PreToolUse` git guard hook preventing accidental destructive git actions (`git reset --hard`, `git clean`, etc.).
 - **Complete Creative Lifecycle**: From initial worldbuilding interview (`/project-setup`) to accepted manuscript pages and synchronized knowledge bases.
 
@@ -25,22 +26,22 @@ The `creative-writing-skills` plugin turns Google Antigravity into a dedicated c
 
 ### Main Agents (Available in Antigravity Agent Selector)
 1. **`muse`** (Orchestrator, `model: inherit`): Primary creative partner. Leads story discussions, maintains the project vision, dispatches subagents, and owns the verdict on drafts.
-2. **`writer`** (Producer, `model: flash`): Produces production prose (fresh drafts, revisions, bridges, alternate takes, or line polishes).
+2. **`writer`** (Producer, `model: pro`): Produces production prose (fresh drafts, revisions, bridges, alternate takes, or line polishes).
 3. **`character-sim`** (Simulator, `model: flash`): In-character conversational partner for voice discovery and dialogue stress-testing.
-4. **`outliner`** (Planner, `model: flash`): Turns story directions into structured saga, arc, chapter, and scene beat outlines.
+4. **`outliner`** (Planner, `model: pro`): Turns story directions into structured saga, arc, chapter, and scene beat outlines.
 
 ### Specialized Subagents (Spawned on Demand by Muse or KB Lead)
-5. **`critic`** (Reviewer): Deep diagnostic review across structure, pacing, voice, prose, and dialogue.
-6. **`continuity-checker`** (Reviewer): Cross-references drafts against project canon, character state, and timeline in `kb/`.
-7. **`reader-sim`** (Reviewer/Simulator): Experiential, moment-by-moment naive reader feedback.
-8. **`brainstormer`** (Producer): Generates divergent narrative options with explicit tradeoffs.
-9. **`style-creator`** (Producer/Analyst): Analyzes prose samples to establish style guides and voice rules.
-10. **`creative-researcher`** (Researcher): Fact and lore grounding for historical, cultural, or domain accuracy.
-11. **`kb-lead`** (Sub-orchestrator): Coordinates knowledge extraction and durable documentation updates.
-12. **`explorer`** (Reviewer/Explorer): Deep cross-file analysis and repository search without editing files.
-13. **`session-miner`** (Reviewer): Extracts decisions, rejected alternatives, and intent from session transcripts.
-14. **`cold-reader`** (Reviewer): Audits project documentation for clarity to an outside reader.
-15. **`kb-maintainer`** (Maintainer): Structural refactoring, link maintenance, and tidying of the `kb/` tree.
+5. **`critic`** (Reviewer, `model: pro`): Deep diagnostic review across structure, pacing, voice, prose, and dialogue.
+6. **`continuity-checker`** (Reviewer, `model: flash`): Cross-references drafts against project canon, character state, and timeline in `kb/`.
+7. **`reader-sim`** (Reviewer/Simulator, `model: flash`): Experiential, moment-by-moment naive reader feedback.
+8. **`brainstormer`** (Producer, `model: flash`): Generates divergent narrative options with explicit tradeoffs.
+9. **`style-creator`** (Producer/Analyst, `model: pro`): Analyzes prose samples to establish style guides and voice rules.
+10. **`creative-researcher`** (Researcher, `model: flash`): Fact and lore grounding for historical, cultural, or domain accuracy.
+11. **`kb-lead`** (Sub-orchestrator, `model: pro`): Coordinates knowledge extraction and durable documentation updates.
+12. **`explorer`** (Reviewer/Explorer, `model: flash`): Deep cross-file analysis and repository search without editing files.
+13. **`session-miner`** (Reviewer, `model: flash`): Extracts decisions, rejected alternatives, and intent from session transcripts.
+14. **`cold-reader`** (Reviewer, `model: flash`): Audits project documentation for clarity to an outside reader.
+15. **`kb-maintainer`** (Maintainer, `model: flash`): Structural refactoring, link maintenance, and tidying of the `kb/` tree.
 
 ---
 
@@ -64,7 +65,7 @@ agy plugin install ./plugin/antigravity
 ```
 Or directly from GitHub:
 ```bash
-agy plugin install https://github.com/haowjy/creative-writing-skills/tree/main/plugin/antigravity
+agy plugin install https://github.com/Bayern99/creative-writing-skills/tree/antigravity-plugin/plugin/antigravity
 ```
 
 ### Antigravity Desktop App

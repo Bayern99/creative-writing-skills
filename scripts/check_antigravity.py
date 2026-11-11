@@ -262,6 +262,11 @@ class Checker:
             extra = set(found_agents) - set(EXPECTED_AGENTS)
             self.error(f"Agent roster mismatch. Missing: {missing}, Extra: {extra}")
 
+        with open(CONFIG_AGENTS_TOML, "rb") as fp:
+            agents_cfg = tomllib.load(fp)
+        expected_agents_table = agents_cfg.get("agents", {})
+        default_model = agents_cfg.get("defaults", {}).get("model", "flash")
+
         for agent_file in agents_dir.glob("*.md"):
             agent_name = agent_file.stem
             content = agent_file.read_text(encoding="utf-8")
@@ -273,14 +278,42 @@ class Checker:
             if not fm.get("description"):
                 self.error(f"Agent {agent_name}: missing or empty description")
 
-            # Model policy: muse = inherit, 14 subagents = flash
+            # Model policy: muse = inherit, subagents match agents.toml
             model = fm.get("model")
+            expected_model = expected_agents_table.get(agent_name, {}).get("model", default_model)
             if agent_name == "muse":
                 if model != "inherit":
                     self.error(f"Agent muse: model must be 'inherit', got '{model}'")
             else:
-                if model != "flash":
-                    self.error(f"Subagent {agent_name}: model must be 'flash', got '{model}'")
+                if model != expected_model:
+                    self.error(f"Subagent {agent_name}: model expected '{expected_model}', got '{model}'")
+
+            # Tools permission whitelist validation
+            tools = fm.get("tools")
+            if tools is not None:
+                if not isinstance(tools, list):
+                    self.error(f"Agent {agent_name}: 'tools' must be a list of strings, got {type(tools)}")
+                else:
+                    valid_tools = {
+                        "view_file",
+                        "write_to_file",
+                        "replace_file_content",
+                        "run_command",
+                        "google_search",
+                        "invoke_subagent",
+                        "manage_subagents",
+                        "send_message",
+                        "ask_question",
+                        "generate_image",
+                    }
+                    unknown_tools = set(tools) - valid_tools
+                    if unknown_tools:
+                        self.error(f"Agent {agent_name}: contains unknown tools {unknown_tools}")
+
+                    if agent_name in REVIEWER_AGENTS:
+                        destructive = set(tools) & {"write_to_file", "replace_file_content", "run_command"}
+                        if destructive:
+                            self.error(f"Reviewer agent {agent_name}: must be strictly read-only, but declares edit/run tools {destructive}")
 
             # Execution policy
             policy = fm.get("commandExecutionPolicy")
@@ -296,10 +329,11 @@ class Checker:
             if (fm.get("subagent") is True) != expected_subagent:
                 self.error(f"Agent {agent_name}: subagent expected {expected_subagent}, got {fm.get('subagent')}")
 
-            # Forbidden fields
-            for forbidden in ("disallowedTools", "effort", "tools"):
+            # Forbidden fields: disallowedTools, effort, optional_skills, subagents
+            for forbidden in ("disallowedTools", "effort", "optional_skills", "subagents"):
                 if forbidden in fm:
                     self.error(f"Agent {agent_name}: contains forbidden frontmatter key '{forbidden}'")
+
 
             # Prompt body checks
             body_bytes = len(body.strip().encode("utf-8"))

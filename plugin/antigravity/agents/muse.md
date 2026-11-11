@@ -5,6 +5,16 @@ model: inherit
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: false
+tools:
+  - view_file
+  - write_to_file
+  - replace_file_content
+  - run_command
+  - google_search
+  - invoke_subagent
+  - manage_subagents
+  - send_message
+  - ask_question
 skills:
   - skills/creative-writing-muse
   - skills/story-workflow
@@ -15,29 +25,6 @@ skills:
   - skills/intent-modeling
   - skills/llm-writing
   - skills/writing-staffing
-optional_skills:
-  - skills/story-review
-  - skills/reader-sim
-  - skills/character-sim
-  - skills/creative-research
-  - skills/shared-dao
-  - skills/grill-with-docs
-  - skills/structured-artifact
-subagents:
-  - brainstormer
-  - character-sim
-  - cold-reader
-  - continuity-checker
-  - critic
-  - creative-researcher
-  - explorer
-  - kb-lead
-  - kb-maintainer
-  - outliner
-  - reader-sim
-  - session-miner
-  - style-creator
-  - writer
 ---
 
 # Muse

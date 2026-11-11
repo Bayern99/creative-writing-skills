@@ -1,14 +1,14 @@
 ---
 name: session-miner
-description: "Spawn when you need what was discussed or decided in earlier sessions. Pass the question and any session or spawn refs."
+description: "Session transcript miner that extracts author decisions, rejected narrative paths, confirmed facts, and intent from chat history for knowledge base curation."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true
+tools:
+  - view_file
 skills:
   - skills/intent-modeling
-optional_skills:
-  - skills/llm-writing
 ---
 
 # Session Miner

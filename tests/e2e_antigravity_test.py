@@ -373,24 +373,27 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             f"User Directive Violation: muse model must be 'inherit', got '{muse_cfg.get('model')}'.",
         )
 
-    def test_t1_09_all_subagents_model_is_flash(self):
-        """User Directive: all 14 subagents must be configured to 'flash'."""
+    def test_t1_09_subagents_model_tiers(self):
+        """Model tiers: pro for creative/critical depth, flash for research/sim/audit."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         defaults = config.get("defaults", {})
         default_model = defaults.get("model")
         agents_table = config.get("agents", {})
+        expected_pro = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
 
         for name in EXPECTED_AGENTS:
             if name == "muse":
                 continue
             agent_cfg = agents_table.get(name, {})
             model = agent_cfg.get("model", default_model)
+            expected = "pro" if name in expected_pro else "flash"
             self.assertEqual(
                 model,
-                "flash",
-                f"User Directive Violation: subagent '{name}' must have model 'flash', got '{model}'.",
+                expected,
+                f"Model tier violation: subagent '{name}' must have model '{expected}', got '{model}'.",
             )
+
 
     def test_t1_10_command_execution_policy_sandbox(self):
         """agents.toml enforces commandExecutionPolicy = 'sandbox'."""
@@ -1500,6 +1503,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
 class Tier4RealWorldScenarioTests(unittest.TestCase):
     """End-to-end scenarios executing CLI commands, isolated installations, and workflows."""
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_01_agy_plugin_validate_strict(self):
         """Execute `agy plugin validate <plugin> --strict --json` ensuring 0 errors and 0 warnings."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1522,7 +1526,9 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             f"`agy plugin validate --strict` emitted findings: {findings}",
         )
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_02_agy_plugin_validate_component_counts(self):
+
         """Validate report confirms 15 agents and 28 skills discovered."""
         if not TARGET_PLUGIN_DIR.exists():
             self.assertTrue(
@@ -1545,6 +1551,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             f"Expected 28 skills in validate components, got {components.get('skills')}",
         )
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_03_isolated_home_plugin_install(self):
         """Install plugin into fresh isolated $HOME via `agy plugin install <target>`."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1564,6 +1571,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             )
             self.assertIn("[ok]", proc.stdout)
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_04_installed_directory_structure(self):
         """Verify installed plugin files exist at ~/.gemini/config/plugins/creative-writing-skills."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1604,6 +1612,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
                 "rules directory missing in installed plugin.",
             )
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_05_import_manifest_registration(self):
         """Verify registration in ~/.gemini/config/import_manifest.json."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1635,6 +1644,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             }
             self.assertIn("creative-writing-skills", installed_plugins)
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_06_agy_plugin_list_json_discovery(self):
         """Verify `agy plugin list --json` reflects installed plugin, version, and component counts."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1673,6 +1683,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             skills_count = len(skills_val) if isinstance(skills_val, list) else skills_val
             self.assertEqual(skills_count, 28)
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_07_agy_agents_discovery(self):
         """Verify `agy agents` discovers declared entry agents (muse, writer, character-sim, outliner)."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1701,6 +1712,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
                     f"Agent '{expected_agent}' not listed in `agy agents` output:\n{output}",
                 )
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_08_agy_plugin_disable_and_enable(self):
         """Verify plugin disable and enable lifecycle toggles activation state in CLI."""
         if not TARGET_PLUGIN_DIR.exists():
@@ -1758,7 +1770,9 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             )
             self.assertTrue(match2.get("enabled"))
 
+    @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_09_agy_plugin_uninstall(self):
+
         """Verify `agy plugin uninstall creative-writing-skills` removes the plugin cleanly."""
         if not TARGET_PLUGIN_DIR.exists():
             self.assertTrue(

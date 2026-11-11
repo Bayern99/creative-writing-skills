@@ -203,11 +203,10 @@ def build_manifest(target_dir: Path) -> None:
             # Keep clean one-line description
             desc = pkg["description"].strip().replace("\n", " ")
             manifest_data["description"] = desc
-        if "homepage" in pkg:
-            manifest_data["homepage"] = pkg["homepage"]
-            manifest_data["repository"] = pkg["homepage"]
         if "license" in pkg:
             manifest_data["license"] = pkg["license"]
+        manifest_data["homepage"] = "https://github.com/Bayern99/creative-writing-skills"
+        manifest_data["repository"] = "https://github.com/Bayern99/creative-writing-skills"
         if "authors" in pkg and pkg["authors"]:
             author_str = pkg["authors"][0]
             m = re.match(r"^([^<]+)<([^>]+)>", author_str)
@@ -314,20 +313,16 @@ def build_agents(
             f"subagent: {'true' if subagent else 'false'}",
         ]
 
+        tools_list = agent_cfg.get("tools", [])
+        if tools_list:
+            lines.append("tools:")
+            for t in tools_list:
+                lines.append(f"  - {t}")
+
         if skills_list:
             lines.append("skills:")
             for sk in skills_list:
                 lines.append(f"  - {sk}")
-
-        if optional_skills_list:
-            lines.append("optional_skills:")
-            for osk in optional_skills_list:
-                lines.append(f"  - {osk}")
-
-        if subagents_list:
-            lines.append("subagents:")
-            for sa in subagents_list:
-                lines.append(f"  - {sa}")
 
         lines.append("---")
         lines.append("")

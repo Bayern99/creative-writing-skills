@@ -26,3 +26,8 @@ When collaborating on a creative writing project in this workspace, observe the 
 - Clearly mark AI-generated proposals, outlines, and brainstorming trees as provisional until the author confirms or incorporates them.
 - When logging decisions, record both the chosen path and rejected alternatives to preserve narrative intent for future writing sessions.
 - Maintain a respectful, encouraging, and craft-centered collaborative partnership.
+
+## 5. Context Routing & Subagent Scope
+- **Creative Writing Domain Tasks**: When working on story lore, outlining, manuscript drafting, scene revision, stylistic critique, character simulation, or worldbuilding, prioritize this plugin's specialized creative writing agents (`muse`, `writer`, `critic`, `outliner`, `creative-researcher`, `kb-lead`, etc.) and loaded craft skills.
+- **General Software & Codebase Exploration**: For general software engineering, build scripts, code refactoring, or repository tooling exploration outside story lore, preserve standard developer delegation (e.g., using global code scouts such as `flash-scout` or built-in `research`).
+- This explicit boundary ensures creative writing workflows utilize rich narrative craft rules, while development exploration continues to utilize user-preferred code scouts without mutual interference.
