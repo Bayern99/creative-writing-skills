@@ -18,6 +18,8 @@ if command -v mars >/dev/null 2>&1; then
   echo "pre-commit: package and committed plugin output (mars build plugin + check)..."
   if ! mars build plugin; then
     fail=1
+  elif ! python3 scripts/build_antigravity.py; then
+    fail=1
   elif ! mars check; then
     fail=1
   fi
@@ -36,7 +38,7 @@ if command -v mars >/dev/null 2>&1; then
   fi
 else
   echo "pre-commit: 'mars' not on PATH — skipping package and plugin checks." >&2
-  echo "             install it with: uv tool install 'mars-agents==0.26.2'" >&2
+  echo "             install it with: uv tool install 'mars-agents==0.27.4'" >&2
 fi
 
 if [ "$fail" -eq 0 ]; then

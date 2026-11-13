@@ -3,52 +3,62 @@
 [![Antigravity 2.0](https://img.shields.io/badge/Antigravity-2.0-blue.svg)](https://antigravity.google)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-A composable, native multi-agent system and craft skill library for creative writing projects in Google Antigravity 2.0.
+A native Antigravity plugin with 15 agents and 27 skills for writing fiction.
 
 ---
 
 ## Overview
 
-The `creative-writing-skills` plugin turns Google Antigravity into a dedicated creative writing studio. At its center is **Muse**, your creative partner that talks through story ideas, outlines narrative arcs, collaborates on prose, and orchestrates specialized subagent lanes for critique, continuity checking, reader simulation, and knowledge capture.
+**Muse** talks through story ideas, plans and drafts with you, and delegates critique, continuity checks, reader simulation, research, and knowledge capture to specialist agents.
 
-### Key Architectural Highlights
-- **Native Antigravity Multi-Agent Architecture**: Built specifically for Antigravity's `invoke_subagent` and `send_message` capabilities.
-- **Optimized Model Strategy**:
-  - **Muse (`model: inherit`)**: Operates on the model you select in Antigravity Desktop or CLI, owning creative direction, orchestration, synthesis, and final quality verdicts.
-  - **14 Specialized Subagents (`model: flash`)**: Fast, high-throughput execution on Gemini 3.8 Flash across all specialist lanes (`writer`, `critic`, `outliner`, `style-creator`, `kb-lead`, `creative-researcher`, `continuity-checker`, `reader-sim`, `character-sim`, `brainstormer`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer`), differentiated by focused system instructions, least-privilege tool allowlists, and tailored skill bundles.
-- **Safety First**: Integrated `PreToolUse` git guard hook preventing accidental destructive git actions (`git reset --hard`, `git clean`, etc.).
-- **Complete Creative Lifecycle**: From initial worldbuilding interview (`/project-setup`) to accepted manuscript pages and synchronized knowledge bases.
+Agents use Antigravity's native `invoke_subagent` and `send_message` tools, with dedicated prompts, tool permissions, and skill bundles. `/project-setup` establishes the story project; `/story-workflow` guides work through planning, drafting, review, and knowledge capture.
+
+## Model Selection: Hydrogen + Flash
+
+Select **Gemini 4 Hydrogen** in the main conversation's model picker for this combination:
+
+| Agents | Configuration | Purpose |
+| --- | --- | --- |
+| `muse` | Main conversation selection | Creative direction, drafting, delegation, final judgment |
+| `writer`, `critic`, `outliner`, `style-creator`, `kb-lead` | `model: inherit` | Prose, editorial judgment, structure, voice, and knowledge decisions |
+| The other 9 specialists | `model: flash` | Focused research, simulation, retrieval, checks, and structural maintenance |
+
+`inherit` follows the calling agent's model. With Hydrogen selected, those five specialists use Hydrogen; changing the parent model changes their inherited model too. This configuration does not pin Hydrogen independently of the parent. The Flash tier targets Gemini 3.8 Flash in the current service; inspect the resolved model in a subagent's details when checking routing.
+
+The [plugin schema](https://antigravity.google/docs/build-plugins) accepts model tiers (`inherit`, `flash_lite`, `flash`, `pro`), while the [model picker](https://antigravity.google/docs/models) selects the primary model. Orchestrator has its own planning/execution routing; choose standalone Hydrogen for the combination above.
 
 ---
 
 ## Agent Roster (15 Agents)
 
-### Main Agents (Available in Antigravity Agent Selector)
-1. **`muse`** (Orchestrator, `model: inherit`): Primary creative partner. Leads story discussions, maintains the project vision, dispatches subagents, and owns the verdict on drafts.
-2. **`writer`** (Producer, `model: flash`): Produces production prose (fresh drafts, revisions, bridges, alternate takes, or line polishes).
-3. **`character-sim`** (Simulator, `model: flash`): In-character conversational partner for voice discovery and dialogue stress-testing.
-4. **`outliner`** (Planner, `model: flash`): Turns story directions into structured saga, arc, chapter, and scene beat outlines.
+Muse is the main creative partner; it can delegate to 14 specialists. Writer, character-sim, and outliner are also available as primary agents. When you select one directly, choose its session model in the app; the tier column below applies to delegated work.
 
-### Specialized Subagents (Spawned on Demand by Muse or KB Lead)
-5. **`critic`** (Reviewer, `model: flash`): Deep diagnostic review across structure, pacing, voice, prose, and dialogue.
-6. **`continuity-checker`** (Reviewer, `model: flash`): Cross-references drafts against project canon, character state, and timeline in `kb/`.
-7. **`reader-sim`** (Reviewer/Simulator, `model: flash`): Experiential, moment-by-moment naive reader feedback.
-8. **`brainstormer`** (Producer, `model: flash`): Generates divergent narrative options with explicit tradeoffs.
-9. **`style-creator`** (Producer/Analyst, `model: flash`): Analyzes prose samples to establish style guides and voice rules.
-10. **`creative-researcher`** (Researcher, `model: flash`): Fact and lore grounding for historical, cultural, or domain accuracy.
-11. **`kb-lead`** (Sub-orchestrator, `model: flash`): Coordinates knowledge extraction and durable documentation updates.
-12. **`explorer`** (Reviewer/Explorer, `model: flash`): Deep cross-file analysis and repository search without editing files.
-13. **`session-miner`** (Reviewer, `model: flash`): Extracts decisions, rejected alternatives, and intent from session transcripts.
-14. **`cold-reader`** (Reviewer, `model: flash`): Audits project documentation for clarity to an outside reader.
-15. **`kb-maintainer`** (Maintainer, `model: flash`): Structural refactoring, link maintenance, and tidying of the `kb/` tree.
+| Agent | Delegated tier | Responsibility |
+| --- | --- | --- |
+| `muse` | Main agent only | Discussion, plans, drafts, and final verdicts |
+| `writer` | `inherit` | Drafts, revisions, bridges, alternate takes, and line polish |
+| `outliner` | `inherit` | Narrative arcs, chapter beats, and scene structures |
+| `critic` | `inherit` | Editorial diagnosis with findings anchored to the draft |
+| `style-creator` | `inherit` | Concrete voice and style guidance from prose samples |
+| `kb-lead` | `inherit` | Writes settled knowledge, deletes stale content, and reorganizes affected pages |
+| `character-sim` | `flash` | Character voice, motivation, and dialogue simulation |
+| `continuity-checker` | `flash` | Canon, character-state, and timeline checks |
+| `reader-sim` | `flash` | First-read reactions, clarity, suspense, and payoff |
+| `brainstormer` | `flash` | Distinct narrative options and their tradeoffs |
+| `creative-researcher` | `flash` | Historical, cultural, and domain research |
+| `explorer` | `flash` | Scoped evidence retrieval with paths, lines, and snippets |
+| `session-miner` | `flash` | Finds transcript passages; the caller judges what they settled |
+| `cold-reader` | `flash` | Documentation clarity for an outside reader |
+| `kb-maintainer` | `flash` | Whole-tree structural changes and link repair |
 
 ---
 
-## 28 Bundled Craft Skills
+## 27 Bundled Craft Skills
 
-The plugin packages 28 modular skills covering every aspect of writing craft:
+The plugin packages these skills:
+
 - **Writing Craft & Style**: `creative-writing-craft`, `writing-principles`, `llm-writing`, `writing-staffing`, `creative-writing-muse`.
-- **Planning & Architecture**: `story-planning`, `story-workflow`, `intent-modeling`, `grill`, `grill-with-docs`.
+- **Planning & Architecture**: `story-planning`, `story-workflow`, `intent-modeling`, `grill`.
 - **Review & Continuity**: `story-review`, `reader-sim`, `character-sim`, `md-validation`, `shared-dao`.
 - **Knowledge Governance**: `story-memory`, `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `correct`, `reflect`, `zoom-out`, `shared-workspace`.
 - **Research & Setup**: `project-setup`, `creative-research`, `structured-artifact`, `writing-sync`.
@@ -68,9 +78,8 @@ agy plugin install https://github.com/Bayern99/creative-writing-skills/tree/anti
 ```
 
 ### Antigravity Desktop App
-1. Navigate to **Settings** -> **Plugins**.
-2. Click **Install Plugin** and select the `plugin/antigravity` folder or paste the GitHub URL.
-3. Confirm that `creative-writing-skills` is active.
+
+For a manual App installation, place the complete `plugin/antigravity/` directory at `~/.gemini/config/plugins/creative-writing-skills/`, or at `.agents/plugins/creative-writing-skills/` inside one project. When updating a manual installation, replace the installed plugin directory as a whole so removed skills do not remain. Open **Customizations** in the left sidebar, select **Installed**, and inspect the enabled plugin's agents and skills. These are the [documented App installation locations](https://antigravity.google/docs/plugins).
 
 ---
 
@@ -84,16 +93,29 @@ In your project directory, run:
 Answer the setup interview questions. The skill will scaffold your `AGENTS.md` and initial `kb/` directory hierarchy (`characters/`, `world/`, `timeline/`, `styles/`).
 
 ### 2. Launch Muse
-In Antigravity Desktop App, select **`muse`** from the Agent dropdown. In CLI:
+In Antigravity Desktop App, select **`muse`** from the Agent dropdown and **Gemini 4 Hydrogen** from the model picker. In CLI:
 ```bash
 agy --agent muse
 ```
 
 ### 3. Plan, Draft, and Review
-- **Brainstorm & Outline**: *"Muse, let's explore possibilities for the climax of Act 1."* Muse will engage with you, record decisions, and dispatch `outliner`.
-- **Drafting**: *"Let's draft Scene 1 from the outline."* Muse coordinates with `writer` using the voice defined in `kb/styles/`.
+
+- **Brainstorm & Outline**: *"Muse, let's explore possibilities for the climax of Act 1."* Muse discusses directions with you and can delegate a separate structural pass to `outliner`.
+- **Drafting**: *"Let's draft Scene 1 from the outline."* Muse drafts with you using the voice in `kb/styles/`, or delegates a fresh draft, revision, alternate take, polish pass, or long draft to `writer`.
 - **Multi-Lane Review**: When a scene is ready, Muse invokes `critic`, `continuity-checker`, and `reader-sim` concurrently for actionable feedback.
 - **Knowledge Capture**: When the scene is approved, Muse dispatches `kb-lead` to keep character sheets and timelines current.
+
+---
+
+## Seeing What Subagents Are Doing
+
+Antigravity App v2.30.0 introduced **Knowledge Work** layout. It replaces subagent cards and expandable tool groups with a live progress line; agents still execute and return their results. The **Software Engineering** layout exposes those controls. See [Interface Layout](https://antigravity.google/docs/settings) and the [App changelog](https://antigravity.google/docs/changelog).
+
+1. Open **Settings > General > Interface Layout** and select **Software Engineering**. The change applies immediately. Business and enterprise accounts already use this layout.
+2. Open the conversation's **Overview** panel at the top right, then **Subagents** and select the agent to read its conversation in the side panel. If the section is hidden, enable **Customize Sections > Subagents**. Use **See all** for completed agents. See [Side panel and Overview](https://antigravity.google/docs/side-panel/).
+3. If the expected agent is absent, expand the dispatch tool call and check that it used native `invoke_subagent` with the intended `TypeName`. A separate terminal/SDK process has a different session and will not supply that native subagent card.
+
+In the CLI, open `/agents` and select the child to inspect its conversation and resolved model. Preserve the child conversation ID when reporting a visibility or routing issue. A final walkthrough is an output artifact; the running conversation is opened through the Subagents section.
 
 ---
 

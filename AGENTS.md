@@ -1,132 +1,92 @@
-# AGENTS.md
+# creative-writing-skills
 
-This file provides guidance to AI Agents when working with this repository.
+Agents and skills for writing fiction: `muse` is the author's creative partner, and
+specialist agents draft, critique, simulate readers and keep the story's KB. The same
+source ships to meridian-cli and Claude Code projects through `mars add`, as a plugin for
+Claude Code, Codex, Cursor and OpenCode, and as Claude.ai skill zips on each GitHub
+Release. Codex, OpenCode and Claude.ai users get the skills but no agents.
+This fork also generates a native Google Antigravity plugin in `plugin/antigravity/`.
 
-## Repository Overview
+## Rules
 
-A Mars source package providing composable creative writing agents and skills for meridian-cli and Claude Code. Also distributes Claude.ai skill uploads via GitHub Releases.
+- **Write muse's method into the skills.** `creative-writing-muse` and `story-workflow`
+  are the only copy of how muse works; the `muse` agent body holds only its job, the
+  verdict it owns, the `@kb-lead` hand-off and its report. Behavior written into the
+  agent body never reaches the users who get skills but no agents. The split mirrors
+  meridian-dev-workflow's `/solo-dev` and `/dev-workflow`, so a lesson from one package
+  has an obvious home in the other.
+- **`plugin/` and the root catalogs are Mars output.** `meridian mars build plugin`
+  writes `plugin/`, `.claude-plugin/`, `.cursor-plugin/` and `package.json` from the
+  source and the published dependency graph; commit them with the source change that
+  caused them. CI rebuilds with the `mars-agents` version pinned in
+  `.github/workflows/ci.yml` and fails on any diff, so a hand edit, a stale tree, or a
+  tree built by a different Mars version fails it.
+- **Widen the dependency filters deliberately.** The `agents` and `skills` lists on
+  `[dependencies.meridian-base]` in `mars.toml` hold every meridian-base item the shipped
+  prose names, and each item they add is surface plugin users see. Keep include mode:
+  it is what keeps meridian-base's `context-autosync` hook out of the plugin.
+- **Destination sync comes from the `writing-sync` dependency.** Don't vendor its
+  skills here.
+- **Project setup has one interview.** `skills/project-setup` is
+  `model-invocable: false` (users start it, agents never do); its resources hold one
+  walkthrough per environment and `SKILL.md` loads exactly one.
+  `bootstrap/project-setup`, meridian-cli's first-run document, only names the skill
+  and the walkthrough to follow.
 
-## Key Distinctions
-
-**`skills/` vs `plugin/`:** `skills/` and `agents/` are the Mars source: consumed by Claude Code and meridian-cli projects via `mars add`. `plugin/` is Mars-owned output: `mars build plugin` lowers the source plus the dependency graph into Claude/Codex/Grok, Cursor, and OpenCode trees and writes the marketplace catalogs. Never edit `plugin/` or those catalogs by hand; edit the source and rebuild (see [Building the plugin](#building-the-plugin)). CI fails on a stale or hand-edited tree.
-
-**`plugin/antigravity/`:** The Google Antigravity 2.0 native plugin target generated deterministically by `python3 scripts/build_antigravity.py` from `plugin/claude/`, `antigravity/agents.toml`, `antigravity/patches.toml`, and `antigravity/overlay/`. Never edit `plugin/antigravity/` by hand; changes should be made to `antigravity/` configuration, overlay files, or patches, followed by rebuilding and verifying with `python3 scripts/check_antigravity.py` and `agy plugin validate --strict plugin/antigravity`.
-
-**Agents vs skills:** Agents are spawned as independent processes (orchestrators, writers, critics). Skills are reference material loaded into agent context (craft knowledge, patterns, conventions). See `agents/` and `skills/` directories.
-
-**Destination sync:** Comes from the `writing-sync` Mars dependency (`haowjy/writing-sync`), not this repo. Do not vendor those skills here.
-
-## Package Management
-
-This repo is both a Mars source package (publishes agents/skills) and a Mars consumer (depends on `meridian-base`).
-
-```bash
-mars check                   # Validate package, schema, and plugin output state
-mars version patch --push    # Bump version, rebuild plugin/, promote CHANGELOG, commit, tag, push
-```
-
-Version lives in `mars.toml` under `[package]`. Tags trigger CI releases. Release with Mars 0.26.2 or newer: older Mars leaves `plugin/.mars-plugin.json` different from a rebuild ([mars-agents#239](https://github.com/haowjy/mars-agents/issues/239)), which fails CI's rebuild-and-diff check on the tag.
-
-**Version sync:** `mars version` bumps `mars.toml`, rebuilds `plugin/` and the root catalogs at the new version, and commits them together, so the plugin version never lags `mars.toml`.
-
-**meridian-cli session roots:** meridian-cli spawns resolve `MERIDIAN_TASK_DIR` for the
-checkout where source work happens, but `MERIDIAN_PROJECT_DIR` stays anchored to
-the session control root for state, profiles, and context. Nested
-`meridian ...` commands use project-root resolution, so CWD alone may not target
-this package. When running Mars from an inherited meridian-cli environment, pass
-the root explicitly:
-
-```bash
-mars build plugin --root "$PWD"
-```
-
-Use explicit `-C <package-root>` whenever running meridian-cli commands for this
-package from an inherited meridian-cli environment. For task checkouts, prefer
-`meridian -C "$MERIDIAN_TASK_DIR" ...`.
-
-`meridian mars` can check and build this package from meridian-cli 0.19.5, which
-bundles Mars 0.26.2. Older meridian-cli releases bundle a Mars too old to resolve
-meridian-base 0.14.
-
-## Building the plugin
-
-`mars build plugin` writes `plugin/` and the files Mars owns at the package root (`.claude-plugin/marketplace.json`, `.cursor-plugin/marketplace.json`, `package.json`) from `agents/`, `skills/`, `bootstrap/`, the `mars.toml` dependency filters, and the resolved dependency graph. Commit the generated tree with the source change that caused it.
+## Commands
 
 ```bash
-mars build plugin        # needs Mars 0.26.2 or newer
-mars check               # reports stale, hand-edited, or missing plugin output
+meridian mars build plugin                         # rebuild plugin/ and the catalogs
+meridian mars check                                # package, frontmatter, stale plugin output
+python3 scripts/check_refs.py                      # every @agent and /skill in plugin/claude resolves
+claude plugins validate plugin/claude              # plugin manifest and components
+claude plugins validate .claude-plugin/marketplace.json
+python3 scripts/create_skill_zips.py               # Claude.ai zips/*.skill (CI does this on release)
+git config core.hooksPath .githooks                # once per clone: run these checks at commit
 ```
 
-The build reads published state only (`mars.toml` plus the dependency graph), never `mars.local.toml`, `mars.lock`, or `.mars/`. The plugin ships this package's agents plus the skills and delegates they name: the `agents` and `skills` filters on `[dependencies.meridian-base]` keep meridian-base's operational surface and its `context-autosync` hook out, `writing-sync` contributes its one skill, and no hand-adapted copy exists any more. Both lists hold the closure of the prose references in the shipped tree — what Mars cannot infer from frontmatter — and `scripts/check_refs.py` fails the build when the closure grows; widen them deliberately, because a dependency skill or agent that comes back in is user-visible surface. Prefer widening over switching to `exclude`: include mode is what keeps the hook out.
+Rebuild, then run `check_refs.py`, after any edit that names an agent or a skill: it
+fails when the dependency filters drop something a shipped file names. The pre-commit
+hook skips its Mars checks when bare `mars` isn't on PATH.
 
-`skills/project-setup` is `model-invocable: false`, so Mars lowers it to a user-invoked `/creative-writing-skills:project-setup`; its resources hold one setup walkthrough per environment, and `SKILL.md` loads exactly one. `bootstrap/project-setup` is its meridian-cli automatic-setup counterpart: bootstrap documents have no plugin surface, so it is not in the plugin, and the meridian-cli first-run document only names the skill and the walkthrough to follow, so the interview has one source.
+## Antigravity target
 
-**Muse's method lives in skills:** `creative-writing-muse` (do the talking, planning and drafting yourself; spawn what needs its own context) and `story-workflow` (intent → direction → produce → verdict → after settle → present) are the one copy of the muse method. The `muse` agent loads both, and its body holds only the job, the verdict it owns, the `@kb-lead` hand-off and the report, so claude.ai, Codex and OpenCode users, who get skills but no agents, run the same method. Write muse behavior into those skills, not the agent body. The shape mirrors meridian-dev-workflow's `/solo-dev` and `/dev-workflow`, so a lesson learned in one package has an obvious home in the other.
+`plugin/antigravity/` is generated output. Edit `antigravity/agents.toml`,
+`antigravity/patches.toml`, or `antigravity/overlay/`, then rebuild from the
+resolved `plugin/claude/` tree. Never hand-edit the generated target. Review
+upstream changes before updating SHA-256 patch gates; a changed hash is a prompt
+to inspect the source, not to accept it blindly.
 
-**Plugin manifest:** `plugin/claude/.claude-plugin/plugin.json` is generated from `[package]` (name, version, description, first author, homepage, license). Claude Code auto-discovers components without it, but the marketplace **add-from-GitHub** path (Cowork / claude.ai) validates the plugin and *rejects it* if the manifest is missing. `claude plugins validate .claude-plugin/marketplace.json` only checks the marketplace schema, not the plugin — so CI also runs `claude plugins validate plugin/claude`, which validates the manifest plus every agent/skill component file.
+Mars 0.27.4 owns and replaces the whole `plugin/` output directory. When building
+both distributions, run Mars first and the Antigravity generator second, then
+compare the complete generated tree. CI and the pre-commit hook use that order.
 
-### Building the Google Antigravity 2.0 Plugin
+The model policy is `inherit` for Muse, Writer, Critic, Outliner, Style Creator,
+and KB Lead, and `flash` for the other nine specialists. Select standalone
+Gemini 4 Hydrogen in the main conversation for Hydrogen + Flash operation;
+changing the main model also changes inherited specialists. Use native
+`invoke_subagent` conversations with the documented tier values.
 
-`python3 scripts/build_antigravity.py` lowers the resolved `plugin/claude/` tree into `plugin/antigravity/` for the Google Antigravity 2.0 Desktop App and `agy` CLI:
-
-- **Source inputs**: reads package metadata from `mars.toml`, agent frontmatter policies from `antigravity/agents.toml`, SHA-256 gated string replacements from `antigravity/patches.toml`, and overlay assets from `antigravity/overlay/`.
-- **Model policy**: Enforces user model directive: `muse` model set to `inherit` (author adjusts in main session), and all 14 subagents configured to `flash` (Gemini 3.8 Flash), differentiating roles via specialized prompts and skill bindings.
-- **Reference lowering**: Rewrites Claude `/creative-writing-skills:<skill>` references to native `/<skill>`.
-- **Frontmatter sanitization**: Strips Claude/Mars-specific artifacts (`disallowedTools`, `AskUserQuestion`, `NotebookEdit`, `Bash(git ...)`, `effort`, `opus`, `sonnet`, `argon`, `luna`). Enforces `commandExecutionPolicy: sandbox`.
-- **Role constraints**: Appends explicit read-only instructions to reviewer agents (`critic`, `reader-sim`, `continuity-checker`, `cold-reader`, `explorer`, `session-miner`) and caller-reporting instructions to subagents so they never prompt the author directly.
-- **Patches & overlay**: Verifies upstream file SHA-256 hashes before patching; injects `assets/logo.svg`, rules (`story-project.md`, `kb-pages.md`), guides (`antigravity.md`, `antigravity-dispatch.md`), and PreToolUse safety hook (`hooks.json`, `scripts/git_guard.py` with `chmod 0755`).
-- **Integrity verification**: Run `python3 scripts/check_antigravity.py` and `agy plugin validate --strict plugin/antigravity` to confirm 0 errors and 0 warnings.
-
-## Design Patterns
-
-**Source tagging (brainstorming):** Untagged = user stated. `<AI>...</AI>` = AI suggestion. `<hidden>...</hidden>` = author-only (twists, secrets).
-
-**Citations (kb pages):** Chapter references (`Chapter 3: Scene where X discovers Y`) and document references (`magic-system.md`).
-
-**Style guides:** Directive AI instructions, not human documentation. Imperative form + examples.
-
-## Development
-
-**Build Claude.ai zips:** `python3 scripts/create_skill_zips.py` → `zips/*.skill` (packages `plugin/claude/skills`)
-
-**Validate package and plugin:** `mars check`
-
-**Check references:** `python3 scripts/check_refs.py` lists every `@agent` and `/skill` in the built `plugin/claude` tree that does not resolve to a shipped item. CI and the pre-commit hook run it after the rebuild, so a filter that drops an item another file names fails there instead of shipping. Run it after any source edit that mentions an agent or a skill.
-
-**Rebuild the plugin:** `mars build plugin`, then commit `plugin/`
-
-**Build Antigravity plugin:** `python3 scripts/build_antigravity.py` rebuilds `plugin/antigravity/`
-
-**Check Antigravity plugin:** `python3 scripts/check_antigravity.py` verifies referential integrity, model tiers, and remnant eradication
-
-**Test Antigravity plugin (E2E):** `python3 tests/e2e_antigravity_test.py` runs all 89 test cases across Tiers 1-4
-
-**Validate plugin manifest:** `claude plugins validate .claude-plugin/marketplace.json` (marketplace schema), `claude plugins validate plugin/claude` (Claude components), and `agy plugin validate --strict plugin/antigravity` (Antigravity components)
-
-**Release flow:** `mars version <patch|minor|major> --push` bumps `mars.toml`, rebuilds `plugin/`, promotes CHANGELOG `[Unreleased]`, commits `vX.Y.Z`, tags it and pushes. CI creates the GitHub Release with `.skill` artifacts.
-
-**Pre-commit hook:** `.githooks/pre-commit` front-loads the distribution-breaking checks (`mars build plugin` + `mars check`, dirty-tree check on generated paths, reference check, `claude plugins validate`, Antigravity `scripts/build_antigravity.py` + `scripts/check_antigravity.py`, and `agy plugin validate --strict`) so they fire at commit time instead of only in CI. It's committed but not auto-installed — enable it once per clone:
+The Antigravity adaptation keeps Writer available for fresh drafts and revisions
+as well as alternate takes, polish, and long drafts; keep its guides aligned with
+the dispatch patches when syncing upstream.
 
 ```bash
-git config core.hooksPath .githooks
+python3 scripts/build_antigravity.py
+python3 scripts/check_antigravity.py
+python3 tests/e2e_antigravity_test.py
+python3 tests/test_m1_adversarial.py
+python3 tests/test_delegation_flow.py
+agy plugin validate --strict plugin/antigravity
 ```
 
-It blocks the commit on failure; bypass a single commit with `git commit --no-verify`. (Skips a check when its CLI, `mars`, `claude`, or `agy`, isn't on PATH.)
-
-**CI:** PRs run `mars check` + rebuild-and-diff on `plugin/` and root catalogs + reference checks + Claude plugin validation + frontmatter validation + zip build, alongside a dedicated `antigravity` job that rebuilds `plugin/antigravity`, checks for stale tree differences, runs `scripts/check_antigravity.py`, runs the 89-test E2E suite, and tests strict `agy plugin validate` and isolated local installation. CI pins `mars-agents==0.26.2` because the committed tree is compared against the Mars that built it. Tag pushes create releases.
-
-## Conventions
-
-- Each skill's `SKILL.md` uses YAML frontmatter with `name` and `description`
-- Skills may reference another skill by name; the dependency filter ships the closure of those references and `scripts/check_refs.py` proves it resolves
-- Agent profiles declare their skills in the `skills:` frontmatter block
-- Generated directories (`.agents/`, `.claude/`, `.codex/`, `.cursor/` and `.opencode/` agent and skill output, `.mars/`, `.meridian/`) are gitignored; `mars sync` writes them
+The build preserves the read-only reviewer tool lists and caller reporting,
+rewrites skill references, and includes the existing git guard hook. Commit the
+configuration and regenerated target together. The live App's child model and
+subagent UI are checked in Antigravity; the repository tests check packaging,
+routing declarations, and dispatch instructions.
 
 ## Watching
-
-Behavior a released change expects but no real run has shown yet. Check it on
-the next runs that exercise it, then delete the entry, fixing the prompt first
-if the runs show otherwise.
 
 - **Muse runs the lifecycle from `/story-workflow`.** On the next muse
   sessions, and the next claude.ai or Codex sessions with
@@ -153,8 +113,3 @@ if the runs show otherwise.
 - **Staffing says "tell it to load", not "attach" (#11).** Meridian muse runs
   still get the named skills onto the spawn, and Claude Code subagents load
   them when the brief names them.
-- **writer on `argon` (0.5.15).** No spawn has run on Gemini 4 Argon yet, and
-  its tool calling is reported unreliable. On the first writer runs routed to
-  it: it reads the brief, style and character-state files, writes the draft
-  where the brief says, and follows the style. If the tool loop fails, make
-  the writer's work text in, text out, or move the default back to Opus.

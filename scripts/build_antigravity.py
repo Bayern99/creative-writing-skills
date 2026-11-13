@@ -8,8 +8,8 @@ plugin at plugin/antigravity/.
 Pipeline:
 1. Validates and copies package metadata from mars.toml into plugin.json
 2. Transforms 15 agents from plugin/claude/agents/*.md using antigravity/agents.toml
-   (enforcing muse: inherit, all 14 subagents: flash, sandbox policy, role constraints)
-3. Copies and transforms all 28 skills from plugin/claude/skills/*
+   (applying role-specific inherit/flash models, sandbox policy, role constraints)
+3. Copies and transforms all 27 skills from plugin/claude/skills/*
    (rewriting /creative-writing-skills:<skill> -> /<skill>, stripping Claude artifacts)
 4. Applies antigravity/patches.toml with strict SHA-256 integrity verification
 5. Injects antigravity/overlay/ assets, rules, guides, hooks.json, and git_guard.py
@@ -260,7 +260,7 @@ def build_agents(
 
         agent_cfg = agents_table.get(agent_name, {})
 
-        # Model policy: muse = inherit, all 14 subagents = flash
+        # Muse follows the session selector; specialists use their configured tier.
         if agent_name == "muse":
             model = "inherit"
         else:
@@ -337,7 +337,7 @@ def build_skills(
     target_dir: Path,
     patches_by_file: Dict[str, Dict[str, Any]],
 ) -> None:
-    """Copy and transform all 28 skills from plugin/claude/skills/*."""
+    """Copy and transform all skills from the resolved plugin/claude/skills/ tree."""
     source_skills_dir = SOURCE_CLAUDE_DIR / "skills"
     if not source_skills_dir.is_dir():
         raise FileNotFoundError(f"Source skills directory missing: {source_skills_dir}")

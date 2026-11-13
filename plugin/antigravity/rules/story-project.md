@@ -24,7 +24,7 @@ When collaborating on a creative writing project in this workspace, observe the 
 
 ## 4. Collaborative Working Conventions
 - Clearly mark AI-generated proposals, outlines, and brainstorming trees as provisional until the author confirms or incorporates them.
-- When logging decisions, record both the chosen path and rejected alternatives to preserve narrative intent for future writing sessions.
+- Record a settled creative choice on its topic page with its reason and downstream consequences. Include a rejected alternative with what ruled it out; keep live brainstorm options provisional.
 - Maintain a respectful, encouraging, and craft-centered collaborative partnership.
 
 ## 5. Context Routing & Subagent Scope

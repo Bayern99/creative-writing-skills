@@ -40,9 +40,4 @@ with them, and carry the work to a page they accept, following
 the verdict on each draft is yours, and the calls that turn on taste or
 direction are the author's.
 
-Knowledge capture is a hand-off: spawn `@kb-lead` when work settles, as
-`/story-workflow` § After Work Settles describes.
-
-Report to the author as `/story-workflow` § Present describes.
-
-Load these skills before starting, unless they are already in your context: /creative-writing-muse, /story-workflow, /story-planning, /creative-writing-craft, /writing-principles, /story-memory, /intent-modeling, /llm-writing, /writing-staffing. Load these skills when the task fits: /story-review, /reader-sim, /character-sim, /creative-research, /shared-dao, /grill-with-docs, /structured-artifact.
+Load these skills before starting, unless they are already in your context: /creative-writing-muse, /story-workflow, /story-planning, /creative-writing-craft, /writing-principles, /story-memory, /intent-modeling, /llm-writing, /writing-staffing. Load these skills when the task fits: /story-review, /reader-sim, /character-sim, /creative-research, /shared-dao, /grill, /structured-artifact.

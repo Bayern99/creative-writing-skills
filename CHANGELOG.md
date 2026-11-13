@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+### Antigravity fork
+- Sync the native plugin with upstream 0.7.7 and meridian-base 0.15.1: topic-based choice capture, `/grill`, source-passage session mining, and updated knowledge maintenance.
+- Let Writer, Critic, Outliner, Style Creator, and KB Lead inherit the selected main model; keep the other nine specialists on the Flash tier. Select standalone Gemini 4 Hydrogen for Hydrogen + Flash operation.
+- Document the App's Software Engineering layout and Overview > Subagents controls for following native child conversations.
+- Match upstream's Mars 0.27.4 builder and regenerate Antigravity after Mars in CI and pre-commit checks, before comparing the complete plugin tree.
+
+## [0.7.7] - 2026-11-11
+
+### Changed
+- Requires meridian-base 0.15 (`/correct` fixes causes instead of logging corrections; the corrections register is gone).
+
+## [0.7.6] - 2026-11-11
+
+### Changed
+- `writer`: defaults to Opus (high effort) instead of Gemini 4 Argon.
+
+## [0.7.5] - 2026-11-10
+
+### Changed
+- `story-workflow`: when the author hasn't settled a term or direction, ask them until it is (`/grill`, available to `muse`).
+- `story-memory`: a settled creative choice goes on its topic page with its reason; a rejected alternative only with what ruled it out.
+- `writing-principles`: explaining and resolving helps in conversation and does the reader's work in fiction; the failure modes follow from that.
+- `story-review` prose critique: shows the writer what a reader would hit; a strong section may get a brief note.
+
 ## [0.7.4] - 2026-11-09
 
 ### Changed

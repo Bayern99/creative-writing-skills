@@ -18,7 +18,7 @@ The files each kind of work needs are in `/story-memory`
 
 In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
 
-All 14 subagents run on `model: flash` (Gemini 3.8 Flash), achieving role differentiation through their dedicated system prompts, tool allowlists, and specialized craft skills. The primary orchestrator `muse` runs on `model: inherit` (inheriting the author's chosen session model in the App/CLI) and owns creative direction, orchestration, synthesis, and final quality verdicts.
+The author selects the primary session model in the App/CLI. `muse` and the five specialists `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. Select standalone Gemini 4 Hydrogen for a Hydrogen + Flash workflow. If the author selects a different main model, the inherited specialists follow that model. The `flash` tier is resolved by Antigravity; check the actual child model in the running session.
 
 **Parallel lanes**: In `invoke_subagent`, you can pass multiple subagent definitions in a single call (e.g. structure, voice, and character critics) to run concurrently.
 

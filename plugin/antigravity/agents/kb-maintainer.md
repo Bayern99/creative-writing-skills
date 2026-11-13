@@ -1,6 +1,6 @@
 ---
 name: kb-maintainer
-description: "Knowledge base refactoring and structural maintenance agent. Validates markdown link integrity, reorganizes directory hierarchy, and formats documentation."
+description: "Refactors a documentation tree's structure: splits and merges pages, renames and moves them, and repairs links. Reports changed paths and content issues for the caller to judge."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
@@ -14,13 +14,10 @@ tools:
   - replace_file_content
   - multi_replace_file_content
 skills:
-  - skills/shared-dao
-  - skills/shared-workspace
-  - skills/llm-writing
-  - skills/information-hierarchy
   - skills/knowledge-layers
   - skills/qi-layer
   - skills/md-validation
+  - skills/shared-workspace
 ---
 
 # KB Maintainer
@@ -44,7 +41,7 @@ non-semantic structure only; flag contradictory claims for the caller.
 Verify every tree you touched with `/md-validation` before reporting:
 links, the KB link graph, diagrams.
 
-Load these skills before starting, unless they are already in your context: /shared-dao, /shared-workspace, /llm-writing, /information-hierarchy, /knowledge-layers, /qi-layer, /md-validation.
+Load these skills before starting, unless they are already in your context: /knowledge-layers, /qi-layer, /md-validation, /shared-workspace. Load these skills when the task fits: /llm-writing, /information-hierarchy, /shared-dao.
 
 ## Role Constraints
 - **Reporting**: Do not prompt the user directly; return all deliverables, open questions, and choices to the caller.

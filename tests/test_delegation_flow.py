@@ -3,8 +3,8 @@
 
 Focuses on static config & schema verification:
 - Muse -> Creative Researcher delegation config, tools permissions ('search_web', 'read_url_content'), model routing ('flash')
-- Muse -> Writer delegation config, stateful continuation schema, tools permissions, model routing ('flash')
-- Muse -> Critic delegation config, cold-read stance, read-only permissions, model routing ('flash')
+- Muse -> Writer delegation config, stateful continuation schema, tools permissions, model routing ('inherit')
+- Muse -> Critic delegation config, cold-read stance, read-only permissions, model routing ('inherit')
 - Parallel multi-agent review lane dispatch schema
 - Nested kb-lead sub-orchestration permissions
 - Context routing isolation
@@ -96,7 +96,7 @@ class TestMuseDelegationFlow(unittest.TestCase):
         self.assertTrue(researcher_file.is_file())
         fm, body = parse_frontmatter(researcher_file.read_text(encoding="utf-8"))
 
-        # Model routing: uniform 'flash' for all subagents
+        # Model routing follows the configured role policy
         self.assertEqual(fm.get("model"), "flash", "creative-researcher must run on 'flash' tier")
         self.assertTrue(fm.get("subagent"), "creative-researcher must be invokable as subagent")
 
@@ -135,8 +135,8 @@ class TestMuseDelegationFlow(unittest.TestCase):
         self.assertTrue(writer_file.is_file())
         fm, body = parse_frontmatter(writer_file.read_text(encoding="utf-8"))
 
-        # Model routing: uniform 'flash' for all subagents
-        self.assertEqual(fm.get("model"), "flash", "writer must run on 'flash' tier")
+        # Model routing follows the configured role policy
+        self.assertEqual(fm.get("model"), "inherit", "writer must inherit the selected main model")
         self.assertTrue(fm.get("subagent"), "writer must be invokable as subagent")
 
         # Tool permissions: file reading and writing permitted, no arbitrary shell commands
@@ -180,8 +180,8 @@ class TestMuseDelegationFlow(unittest.TestCase):
         self.assertTrue(critic_file.is_file())
         fm, body = parse_frontmatter(critic_file.read_text(encoding="utf-8"))
 
-        # Model routing: uniform 'flash' for all subagents
-        self.assertEqual(fm.get("model"), "flash", "critic must run on 'flash' tier")
+        # Model routing follows the configured role policy
+        self.assertEqual(fm.get("model"), "inherit", "critic must inherit the selected main model")
         self.assertTrue(fm.get("subagent"), "critic must be invokable as subagent")
 
         # Tool permissions: strictly read-only
@@ -238,7 +238,7 @@ class TestMuseDelegationFlow(unittest.TestCase):
             agent_file = AGENTS_DIR / f"{sub['TypeName']}.md"
             self.assertTrue(agent_file.is_file())
             fm, _ = parse_frontmatter(agent_file.read_text(encoding="utf-8"))
-            self.assertEqual(fm["model"], "flash")
+            self.assertEqual(fm["model"], "inherit" if fm["name"] == "critic" else "flash")
             self.assertTrue(fm["subagent"])
 
     def test_nested_kb_lead_orchestration(self):
@@ -247,7 +247,7 @@ class TestMuseDelegationFlow(unittest.TestCase):
         self.assertTrue(kb_lead_file.is_file())
         fm, body = parse_frontmatter(kb_lead_file.read_text(encoding="utf-8"))
 
-        self.assertEqual(fm.get("model"), "flash", "kb-lead runs on uniform 'flash' tier")
+        self.assertEqual(fm.get("model"), "inherit", "kb-lead must inherit the selected main model")
         tools = fm.get("tools", [])
         self.assertIn("invoke_subagent", tools, "kb-lead needs invoke_subagent to spawn miners and maintainers")
         self.assertIn("send_message", tools, "kb-lead needs send_message for follow-up with maintainers")

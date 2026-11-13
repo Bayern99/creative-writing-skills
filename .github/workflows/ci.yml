@@ -19,7 +19,7 @@ jobs:
       # Mars that built it, so CI must run the version authors build with.
       - name: Install Mars
         run: |
-          uv tool install "mars-agents==0.26.2"
+          uv tool install "mars-agents==0.27.4"
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Setup Node.js
@@ -36,10 +36,11 @@ jobs:
       - name: Check committed plugin output is up to date
         run: |
           mars build plugin
+          python3 scripts/build_antigravity.py
           changed=$(git diff --name-only -- plugin .claude-plugin .cursor-plugin package.json)
           untracked=$(git ls-files --others --exclude-standard -- plugin .claude-plugin .cursor-plugin package.json)
           if [ -n "$changed$untracked" ]; then
-            echo "::error::Committed plugin output is stale. Run 'mars build plugin' and commit the result."
+            echo "::error::Committed plugin output is stale. Run 'mars build plugin' followed by 'python3 scripts/build_antigravity.py' and commit the result."
             printf '%s\n' "$changed" "$untracked"
             exit 1
           fi

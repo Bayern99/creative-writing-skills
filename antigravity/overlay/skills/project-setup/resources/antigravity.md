@@ -20,12 +20,11 @@ Verify installation:
 agy plugin list
 agy agents
 ```
-You will see `creative-writing-skills` enabled with its 15 agents and 28 skills.
+You will see `creative-writing-skills` enabled with its 15 agents and 27 skills.
 
 ### Via Antigravity Desktop App
-1. Open Antigravity Settings -> **Plugins**.
-2. Select **Install Plugin** and provide the repository URL or local plugin directory.
-3. Verify that the plugin appears enabled with the quill logo.
+
+Place the complete `plugin/antigravity/` directory at `~/.gemini/config/plugins/creative-writing-skills/` for all workspaces, or at `.agents/plugins/creative-writing-skills/` within one project. Replace the whole installed plugin directory when updating a manual installation, so removed skills do not remain. Open **Customizations > Installed** from the left sidebar to inspect and enable the plugin. See the [official plugin guide](https://antigravity.google/docs/plugins).
 
 ---
 
@@ -33,18 +32,24 @@ You will see `creative-writing-skills` enabled with its 15 agents and 28 skills.
 
 ### Selecting Your Main Agent
 In Antigravity, four primary entry points are exposed in the Agent dropdown:
-- **`muse` (Recommended)**: The orchestrator and your collaborative creative partner. Coordinates all 13 specialized subagents, leads planning, and owns the verdict on drafts. Runs with `model: inherit`, honoring your session model selection.
+- **`muse` (Recommended)**: Your collaborative creative partner. Coordinates 14 specialist subagents, leads planning and drafting, and owns the verdict on drafts. Uses your session model selection.
 - **`writer`**: Standalone production prose writer for quick drafting or revisions.
 - **`character-sim`**: Interactive in-character conversational partner for voice discovery.
 - **`outliner`**: Dedicated story architect for outline generation.
 
-All remaining subagents (`critic`, `reader-sim`, `continuity-checker`, etc.) run on `model: flash` and are spawned dynamically by `muse`.
+Select **Gemini 4 Hydrogen** in the main conversation's model picker. The five specialists `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine use `model: flash` for Gemini 3.8 Flash. Inherited children follow the calling agent's model, so choosing another main model changes them too. When you select writer, character-sim, or outliner directly as the primary agent, choose that session's model in the picker.
+
+The plugin uses the [documented model tiers](https://antigravity.google/docs/build-plugins). Choose standalone Hydrogen for this mix; [Orchestrator](https://antigravity.google/docs/models) has a separate planning/execution configuration.
 
 To launch in CLI:
 ```bash
 agy --agent muse
 ```
-Or in Desktop App, select **muse** from the top agent selector.
+Or in Desktop App, select **muse** from the agent selector.
+
+### Viewing Subagent Progress
+
+For clickable child conversations, choose **Settings > General > Interface Layout > Software Engineering** and open the **Overview** panel at the conversation's top right. Select a child under **Subagents** to open its conversation in the side panel. **Knowledge Work** layout condenses subagent cards and tool calls into a live progress line. Switching layouts applies immediately. See [Interface Layout](https://antigravity.google/docs/settings) and [Side panel and Overview](https://antigravity.google/docs/side-panel/).
 
 ---
 
@@ -77,11 +82,10 @@ Or in Desktop App, select **muse** from the top agent selector.
 
 1. **Plan**:
    Ask `muse`: *"Let's plan Chapter 4."*
-   `muse` reviews `AGENTS.md` and current character states in `kb/`, then invokes `outliner` to generate structured scene beats in `work/outlines/ch04.md`.
+   `muse` reviews `AGENTS.md` and current character states in `kb/`, then plans with you. It can delegate a separate structural pass to `outliner`.
 
 2. **Draft**:
-   Collaborate with `muse` on prose, or ask `muse` to invoke `writer` to produce a fresh draft:
-   `writer` drafts the scene strictly following the style guides in `kb/styles/` and reports judgment calls back to `muse`.
+   Collaborate with `muse` on prose in its own context, or delegate a fresh draft, revision, alternate take, polish pass, or long draft to `writer`; pass the style guides in `kb/styles/` and ask it to report judgment calls to `muse`.
 
 3. **Review**:
    `muse` invokes specialized reviewer subagents concurrently via `invoke_subagent`:
@@ -90,7 +94,7 @@ Or in Desktop App, select **muse** from the top agent selector.
    - **`reader-sim`**: Provides emotional, moment-by-moment feedback from the reader's perspective.
 
 4. **Revise**:
-   `muse` synthesizes reviewer findings, helps you prioritize the highest-impact fixes, and updates the prose with `writer`.
+   `muse` synthesizes reviewer findings, helps you prioritize the highest-impact fixes, and revises with you or the existing `writer` instance. After two critique rounds on a chapter, it presents remaining concerns for your decision.
 
 5. **Knowledge Capture**:
-   Once the chapter is accepted, `muse` invokes `kb-lead` to extract durable decisions and update character sheets in `kb/`.
+   Once a chapter or ruling settles, `muse` briefs `kb-lead` with what settled and the supporting files. `kb-lead` updates knowledge, deletes stale content, and reorganizes affected pages. Trial directions stay marked as trials.

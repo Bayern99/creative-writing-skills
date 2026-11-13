@@ -45,7 +45,7 @@ replace = """## Model Selection & Multi-Agent Dispatch
 
 In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
 
-All 14 subagents run on `model: flash` (Gemini 3.8 Flash), achieving role differentiation through their dedicated system prompts, tool allowlists, and specialized craft skills. The primary orchestrator `muse` runs on `model: inherit` (inheriting the author's chosen session model in the App/CLI) and owns creative direction, orchestration, synthesis, and final quality verdicts.
+The author selects the primary session model in the App/CLI. `muse` and the five specialists `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. Select standalone Gemini 4 Hydrogen for a Hydrogen + Flash workflow. If the author selects a different main model, the inherited specialists follow that model. The `flash` tier is resolved by Antigravity; check the actual child model in the running session.
 
 **Parallel lanes**: In `invoke_subagent`, you can pass multiple subagent definitions in a single call (e.g. structure, voice, and character critics) to run concurrently.
 
@@ -66,7 +66,7 @@ fresh drafts, revision passes, polish passes, and drafts long enough to fill you
 
 [[patches]]
 file = "skills/story-workflow/SKILL.md"
-sha256 = "1ccf67190eea402d22ca46c9782a794ecb3283eb44df2f0cdbf06c9d98a63576"
+sha256 = "48ef642786e0b74f9ae58a5782e98409edccde718434858b55f370c72a8538cb"
 description = "Update story-workflow subagent dispatch syntax"
 search = """When you can spawn this package's agents (`@critic`, `@writer`, `@kb-lead`
 and the rest), spawn the lanes that need a context of their own, as
@@ -90,10 +90,47 @@ from the reader's side, revise the highest-impact issue first."""
 
 [[patches]]
 file = "agents/session-miner.md"
-sha256 = "fbf1adb899baece2851d763f0c522abb86e2972389e35de4fec0a32fe175ef6c"
-description = "Direct session-miner to Antigravity transcript location"
-search = """Before mining, read the runtime's guidance on reading past sessions."""
-replace = """Before mining, inspect the Antigravity conversation transcripts at `<appDataDir>/brain/<id>/.system_generated/logs/transcript.jsonl` or session history files."""
+sha256 = "2344f12f1c35c22fda22e83075706c4551ddbc7e45178384c965fd7cc8957102"
+description = "Locate Antigravity transcript passages for caller interpretation"
+search = """# Session Miner
+
+Find where past conversations discuss the question you were given, and
+point your caller to each passage. Your caller knows the work behind the
+question and you see only your brief, so it reads the passages itself to
+judge what they settled. Your notes say what each passage covers, so it can
+choose what to open.
+
+Before mining, read the runtime's guidance on reading past sessions.
+
+Search broadly: the terms in the question, their synonyms, and the names
+of the files and features involved. Cover where the topic starts, each
+place it shifts, and the last place it comes up; a later message can change
+an earlier one, so the last passage matters most.
+
+Report the passages grouped by topic, in conversation order. For each:
+the session and position, the exact command that opens it, as the
+runtime's search prints it, and one line on what is discussed there. Then
+list what you searched for and found nothing."""
+replace = """# Session Miner
+
+Find where past conversations discuss the question you were given, and
+point your caller to each passage. Your caller knows the work behind the
+question and you see only your brief, so it reads the passages itself to
+judge what they settled. Your notes say what each passage covers, so it can
+choose what to open.
+
+Before mining, use the transcript or session history paths supplied by the caller and consult any available runtime guidance. Antigravity conversation logs may be located at `<appDataDir>/brain/<id>/.system_generated/logs/transcript.jsonl`; confirm the actual path with read-only file discovery.
+
+Search broadly: the terms in the question, their synonyms, and the names
+of the files and features involved. Cover where the topic starts, each
+place it shifts, and the last place it comes up; a later message can change
+an earlier one, so the last passage matters most.
+
+Report the passages grouped by topic, in conversation order. For each:
+the transcript path, exact message or line position, a short excerpt, and
+one line on what is discussed there. Preserve an opening command only when
+the runtime actually supplies one; otherwise give the file and read location.
+Then list what you searched for and found nothing."""
 
 [[patches]]
 file = "skills/writing-sync/resources/installation.md"

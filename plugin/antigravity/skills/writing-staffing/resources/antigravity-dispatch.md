@@ -17,9 +17,11 @@ The system operates as a tiered hub-and-spoke hierarchy:
 
 ## 2. Model Tier Allocation
 
-- **`muse` (`model: inherit`)**: Inherits the author's chosen session model in Antigravity Desktop or CLI, owning creative direction, orchestration, result integration, and final quality judgment.
-- **All 14 Subagents (`model: flash`)**: Configured uniformly to `model: flash` (Gemini 3.8 Flash) for fast, high-throughput parallel execution across all specialist lanes (`writer`, `critic`, `outliner`, `style-creator`, `kb-lead`, `creative-researcher`, `continuity-checker`, `reader-sim`, `character-sim`, `brainstormer`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer`).
-- **Role Differentiation**: Specialist independence comes from dedicated system prompts, explicit least-privilege `tools` allowlists, and targeted craft skill bundles.
+- **Main session**: The author selects the model for `muse` in Antigravity's model picker. Recommend standalone **Gemini 4 Hydrogen** for the Hydrogen + Flash configuration.
+- **Inherited specialists**: `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit` for prose, critique, structure, voice, and knowledge judgments.
+- **Flash specialists**: `brainstormer`, `character-sim`, `continuity-checker`, `reader-sim`, `creative-researcher`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer` use `model: flash`.
+
+`inherit` selects the calling agent's model; it is not an independent Hydrogen pin. Changing the main model changes the inherited specialists too. Flash currently resolves to Gemini 3.8 Flash. Inspect the resolved child model when verifying a run, and report the observed model rather than inferring it from the role name. See [plugin model tiers](https://antigravity.google/docs/build-plugins) and [model selection](https://antigravity.google/docs/models).
 
 ---
 
@@ -27,7 +29,7 @@ The system operates as a tiered hub-and-spoke hierarchy:
 
 ### Native Call Schema
 Per the official Antigravity Hooks and Subagents documentation, `invoke_subagent` accepts a `Subagents` array where each entry defines `TypeName`, `Role`, `Prompt`, and optional `Workspace` (`inherit`, `branch`, or `share`).
-*(Note: Each subagent's model tier is governed by its frontmatter `model: flash` declaration; whether a runtime per-call `Model` override parameter is honored by all CLI/Desktop versions is not explicitly specified in the public Hooks schema, so rely on the agent frontmatter rather than passing `Model` in the call payload.)*
+Use each bundled agent's `model: inherit` or `model: flash` frontmatter for the role allocation above. The examples use the fields documented in the [Hooks reference](https://antigravity.google/docs/hooks). Follow the active runtime's tool schema for any additional parameters; keep model slugs out of these tier-based examples.
 
 ### Parallel Review Lanes
 When a draft is ready for review, `muse` spawns multiple review lanes concurrently in a single tool call:
@@ -107,3 +109,9 @@ Manage active background subagents when needed:
 - **`kill_all`**: Cleanly terminate all active subagents and their descendants.
 
 Subagents report their results asynchronously back to the calling agent. Allow subagents to finish and synthesize the aggregated findings before presenting prioritized choices to the author.
+
+## 7. Visible Progress
+
+Keep delegation on native `invoke_subagent` sessions so the author can open each child conversation. After dispatch, identify the role and returned conversation ID; when a child reports a milestone or blocker, summarize that observed update. Use `send_message` for follow-up instructions to an existing child.
+
+The App's **Knowledge Work** layout hides subagent cards behind a progress line. To inspect child conversations, use **Settings > General > Interface Layout > Software Engineering**, then open the **Overview** panel at the conversation's top right and select a child under **Subagents**. Its conversation opens in the side panel. **See all** includes completed children. See [Interface Layout](https://antigravity.google/docs/settings) and [Subagent monitoring](https://antigravity.google/docs/subagents).

@@ -1,5 +1,7 @@
 # antigravity/agents.toml
 # Source configuration for building Antigravity 2.0 agents from plugin/claude/agents/
+# Select Gemini 4 Hydrogen in the main session for Hydrogen + Flash routing.
+# Inherited specialists follow the calling agent's model when that selection changes.
 
 [defaults]
 commandExecutionPolicy = "sandbox"
@@ -46,7 +48,7 @@ optional_skills = [
   "skills/character-sim",
   "skills/creative-research",
   "skills/shared-dao",
-  "skills/grill-with-docs",
+  "skills/grill",
   "skills/structured-artifact",
 ]
 subagents = [
@@ -67,7 +69,7 @@ subagents = [
 ]
 
 [agents.writer]
-model = "flash"
+model = "inherit"
 mainAgent = true
 subagent = true
 role = "producer"
@@ -93,7 +95,7 @@ optional_skills = [
 ]
 
 [agents.critic]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "reviewer"
@@ -115,7 +117,7 @@ optional_skills = [
 ]
 
 [agents.outliner]
-model = "flash"
+model = "inherit"
 mainAgent = true
 subagent = true
 role = "planner"
@@ -136,7 +138,7 @@ skills = [
 ]
 
 [agents.style-creator]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "producer"
@@ -258,11 +260,11 @@ skills = [
 ]
 
 [agents.kb-lead]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "lead"
-description = "Sub-orchestrator managing the story knowledge base (kb/). Spawns explorer, session-miner, cold-reader, and kb-maintainer to distill decisions into durable canonical documentation."
+description = "Maintains the story knowledge base after a change settles. Reads the supplied decisions and evidence, writes updates, deletes stale or redundant content, and reorganizes the pages it touches. Delegates scoped retrieval and whole-tree structural maintenance; reports deletions, additions, contradictions, and gaps."
 tools = [
   "view_file",
   "list_dir",
@@ -277,14 +279,14 @@ tools = [
   "send_message",
 ]
 skills = [
-  "skills/shared-dao",
   "skills/knowledge-layers",
   "skills/qi-maintenance",
   "skills/llm-writing",
-  "skills/information-hierarchy",
 ]
 optional_skills = [
   "skills/qi-layer",
+  "skills/shared-dao",
+  "skills/information-hierarchy",
   "skills/intent-modeling",
   "skills/shared-workspace",
   "skills/md-validation",
@@ -301,7 +303,7 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
-description = "Story lore and knowledge base explorer. Performs deep read sweeps across project files, canon documents, and character files to answer story questions without editing files."
+description = "Finds evidence for a question within a clearly assigned area of project files and history. Returns facts with file paths, line references, and snippets so the caller can read what matters. Writes no files."
 tools = [
   "view_file",
   "list_dir",
@@ -315,16 +317,14 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
-description = "Session transcript miner that extracts author decisions, rejected narrative paths, confirmed facts, and intent from chat history for knowledge base curation."
+description = "Finds where earlier sessions discuss a question. Returns each passage's session, line positions, how to open it, and a one-line topic note. The caller reads the passages and judges what they settled."
 tools = [
   "view_file",
   "list_dir",
   "find_by_name",
   "grep_search",
 ]
-skills = [
-  "skills/intent-modeling",
-]
+skills = []
 optional_skills = [
   "skills/llm-writing",
 ]
@@ -354,7 +354,7 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "maintainer"
-description = "Knowledge base refactoring and structural maintenance agent. Validates markdown link integrity, reorganizes directory hierarchy, and formats documentation."
+description = "Refactors a documentation tree's structure: splits and merges pages, renames and moves them, and repairs links. Reports changed paths and content issues for the caller to judge."
 tools = [
   "view_file",
   "list_dir",
@@ -365,11 +365,13 @@ tools = [
   "multi_replace_file_content",
 ]
 skills = [
-  "skills/shared-dao",
-  "skills/shared-workspace",
-  "skills/llm-writing",
-  "skills/information-hierarchy",
   "skills/knowledge-layers",
   "skills/qi-layer",
   "skills/md-validation",
+  "skills/shared-workspace",
+]
+optional_skills = [
+  "skills/llm-writing",
+  "skills/information-hierarchy",
+  "skills/shared-dao",
 ]

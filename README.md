@@ -33,9 +33,9 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 Install creative-writing-skills as a native Google Antigravity 2.0 plugin in the Desktop App or CLI.
 
 **Antigravity Desktop App**:
-1. Open Antigravity Desktop.
-2. Go to **Settings** → **Plugins** → **Install plugin** → **Install from local directory...**
-3. Select the `plugin/antigravity` folder from this repository.
+1. Place the complete `plugin/antigravity/` directory at `~/.gemini/config/plugins/creative-writing-skills/`, or at `.agents/plugins/creative-writing-skills/` within one project. Replace the installed directory as a whole when updating manually.
+2. Open **Customizations → Installed** in Antigravity's left sidebar.
+3. Inspect and enable the Creative Writing plugin. See the [official plugin guide](https://antigravity.google/docs/plugins).
 4. Open the Agent selector in any conversation and choose **muse** as your main agent.
 
 **Antigravity CLI (`agy`)**:
@@ -58,7 +58,7 @@ agy agents
 **First session workflow**:
 1. In your project directory, run `/project-setup` in Antigravity to create your `AGENTS.md`, `kb/` layout, and voice styles.
 2. Start writing with `muse`. Muse acts as your orchestrator and primary creative partner, using `invoke_subagent` to spawn specialized subagents (`critic`, `reader-sim`, `continuity-checker`, `writer`, `kb-lead`) in independent parallel contexts.
-3. **Model Strategy**: `muse` runs on `model: inherit`, respecting whatever model tier you select in the Desktop App or CLI. All 14 specialized subagents run on `model: flash` (Gemini 3.8 Flash), achieving distinct expertise through dedicated system prompts and craft skills.
+3. **Model Strategy**: Choose the main model in the Desktop App or CLI. `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. Select standalone Gemini 4 Hydrogen for Hydrogen + Flash operation. Switching the main model also switches inherited specialists. See the [Antigravity guide](plugin/antigravity/README.md) for routing and subagent visibility settings.
 
 ### Mars (meridian-cli)
 
@@ -69,7 +69,7 @@ meridian mars sync
 
 Then run `meridian` to start a meridian-cli session with muse. First-time setup runs the bootstrap automatically.
 
-`@writer` defaults to Gemini 4 Argon (`argon`). Mars routes it through OpenCode, so enable the `.opencode` target in your `mars.toml` and sign in to a provider there that serves it; otherwise writer runs on Opus.
+`@writer` defaults to Opus at high effort.
 
 ### Claude Code / Cowork
 
@@ -170,7 +170,7 @@ flowchart TB
 | **style-creator** | Analyzes prose samples to produce style reference files for the project's voice |
 | **kb-lead** | Mines settled work for decisions and updates the kb; the agent behind `story-memory` |
 
-Four `meridian-base` delegates ship with the plugin for the work around the writing: `explorer` reads widely and reports facts, `session-miner` mines past sessions for decisions already made, `cold-reader` checks text that outlives the work for what a reader who wasn't there cannot follow, and `kb-maintainer` refactors a documentation tree's structure.
+Four `meridian-base` delegates ship with the plugin for the work around the writing: `explorer` finds what's related in a large area, `session-miner` finds where past sessions discuss a question, `cold-reader` checks text that outlives the work for what a reader who wasn't there cannot follow, and `kb-maintainer` refactors a documentation tree's structure.
 
 Knowledge extraction into the kb in harnesses without agents stays in the conversation: the muse applies the `story-memory` skill directly.
 
@@ -192,7 +192,7 @@ Knowledge extraction into the kb in harnesses without agents stays in the conver
 | **shared-dao** | Shared vocabulary: canonical story terms, aliases, and ambiguity resolution |
 | **project-setup** | One-time guided setup (user-invoked): interviews you, then creates AGENTS.md, the kb layout, and style files |
 
-The plugin also ships the shared `meridian-base` skills its agents load: `grill` (with `grill-with-docs`) to stress-test a direction in rounds of questions, `correct` to fix a class of repeated mistake at the strongest level that holds, `zoom-out` for orienting in an unfamiliar area, and `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `intent-modeling`, `md-validation`, `reflect`, `shared-workspace`, and `structured-artifact` for the rest of the knowledge and craft discipline.
+The plugin also ships the shared `meridian-base` skills its agents load: `correct` to fix a class of repeated mistake at the strongest level that holds, `zoom-out` for orienting in an unfamiliar area, and `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `intent-modeling`, `md-validation`, `reflect`, `shared-workspace`, and `structured-artifact` for the rest of the knowledge and craft discipline.
 
 ## Project Layout
 

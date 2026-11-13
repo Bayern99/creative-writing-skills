@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Comprehensive 4-Tier Opaque-Box E2E Test Suite for creative-writing-skills Antigravity 2.0 Plugin.
 
-Authoritative Requirements & Specifications:
-- ORIGINAL_REQUEST.md:
-    * User model directive: muse = inherit, all 14 subagents = flash (Gemini 3.8 Flash).
+Current Requirements & Specifications:
+- Native Antigravity configuration:
+    * Model policy: muse and 5 creative judgment specialists = inherit; 9 others = flash.
+      Selecting Hydrogen in the main session gives the Hydrogen + Flash combination.
     * Subagents differentiated by specialized system prompt and skill bundles.
     * 0 errors and 0 warnings with `agy plugin validate --strict`.
     * Native multi-agent orchestration via `invoke_subagent`.
@@ -11,7 +12,7 @@ Authoritative Requirements & Specifications:
     * 15 agents: muse (orchestrator), writer, character-sim, outliner, critic, brainstormer,
       continuity-checker, reader-sim, style-creator, creative-researcher, kb-lead, explorer,
       session-miner, cold-reader, kb-maintainer.
-    * 28 skills from upstream closure (12 native, 15 meridian-base, 1 writing-sync).
+    * 27 skills from upstream closure (12 native, 14 meridian-base, 1 writing-sync).
     * Overlay assets, rules (story-project.md, kb-pages.md), hooks.json, and git_guard.py.
     * Complete elimination of Claude/Mars artifacts (opus, sonnet, argon, disallowedTools, etc.).
 - spec_miner_antigravity/handoff.md:
@@ -82,6 +83,7 @@ EXPECTED_AGENTS = [
 ]
 
 ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
+INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -112,7 +114,6 @@ EXPECTED_SKILLS = [
     "creative-writing-craft",
     "creative-writing-muse",
     "grill",
-    "grill-with-docs",
     "information-hierarchy",
     "intent-modeling",
     "knowledge-layers",
@@ -373,8 +374,8 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             f"User Directive Violation: muse model must be 'inherit', got '{muse_cfg.get('model')}'.",
         )
 
-    def test_t1_09_all_subagents_model_is_flash(self):
-        """User Directive: all 14 subagents must be configured to 'flash'."""
+    def test_t1_09_subagent_models_match_role_policy(self):
+        """Configured and generated specialists preserve the inherit/Flash role split."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         defaults = config.get("defaults", {})
@@ -386,11 +387,15 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
                 continue
             agent_cfg = agents_table.get(name, {})
             model = agent_cfg.get("model", default_model)
+            expected_model = "inherit" if name in INHERIT_MODEL_AGENTS else "flash"
             self.assertEqual(
                 model,
-                "flash",
-                f"User Directive Violation: subagent '{name}' must have model 'flash', got '{model}'.",
+                expected_model,
+                f"Subagent '{name}' must have model '{expected_model}', got '{model}'.",
             )
+            agent_path = TARGET_AGENTS_DIR / f"{name}.md"
+            frontmatter, _ = parse_yaml_frontmatter(agent_path.read_text(encoding="utf-8"))
+            self.assertEqual(frontmatter.get("model"), expected_model, f"Generated model differs for {name}.")
 
 
     def test_t1_10_command_execution_policy_sandbox(self):
@@ -491,8 +496,8 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
                 f"Agent {path.stem} subagent flag expected {expected_sub}, got {is_sub}.",
             )
 
-    def test_t1_17_all_28_skills_present(self):
-        """All 28 skill directories are present in plugin/antigravity/skills/ (M3 deliverable)."""
+    def test_t1_17_all_27_skills_present(self):
+        """All 27 skill directories are present in plugin/antigravity/skills/."""
         if not TARGET_SKILLS_DIR.exists():
             self.assertTrue(
                 TARGET_SKILLS_DIR.exists(),
@@ -807,7 +812,7 @@ class Tier2BoundaryCornerCaseTests(unittest.TestCase):
             )
 
     def test_t2_11_skill_md_body_under_24k_bytes(self):
-        """All 28 SKILL.md body contents are strictly <= 24,000 bytes (prevents validator cutoff warning)."""
+        """All 27 SKILL.md body contents are strictly <= 24,000 bytes (prevents validator cutoff warning)."""
         skills_dir = (
             TARGET_SKILLS_DIR
             if TARGET_SKILLS_DIR.exists()
@@ -1170,7 +1175,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
         )
 
     def test_t3_06_agent_skills_exist_in_plugin_skills(self):
-        """Every skill referenced in agents.toml [agents.*.skills] exists in the 28 skills closure."""
+        """Every skill referenced in agents.toml [agents.*.skills] exists in the 27 skills closure."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         for agent_name, cfg in config.get("agents", {}).items():
@@ -1183,7 +1188,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
                 )
 
     def test_t3_07_agent_optional_skills_exist(self):
-        """Every optional skill referenced in agents.toml exists in the 28 skills closure."""
+        """Every optional skill referenced in agents.toml exists in the 27 skills closure."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         for agent_name, cfg in config.get("agents", {}).items():
@@ -1195,8 +1200,8 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
                     f"Agent '{agent_name}' references non-existent optional skill '{skill_name}'.",
                 )
 
-    def test_t3_08_all_28_skills_accounted_for(self):
-        """The total inventory of skills matches the 28 closure skills exactly."""
+    def test_t3_08_all_27_skills_accounted_for(self):
+        """The total inventory of skills matches the 27 closure skills exactly."""
         skills_dir = (
             TARGET_SKILLS_DIR
             if TARGET_SKILLS_DIR.exists()
@@ -1527,7 +1532,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_02_agy_plugin_validate_component_counts(self):
 
-        """Validate report confirms 15 agents and 28 skills discovered."""
+        """Validate report confirms 15 agents and 27 skills discovered."""
         if not TARGET_PLUGIN_DIR.exists():
             self.assertTrue(
                 TARGET_PLUGIN_DIR.exists(),
@@ -1545,8 +1550,8 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
         )
         self.assertEqual(
             components.get("skills"),
-            28,
-            f"Expected 28 skills in validate components, got {components.get('skills')}",
+            len(EXPECTED_SKILLS),
+            f"Expected {len(EXPECTED_SKILLS)} skills in validate components, got {components.get('skills')}",
         )
 
     @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
@@ -1672,14 +1677,15 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
                 None,
             )
             self.assertIsNotNone(match, "creative-writing-skills not found in plugin list.")
-            self.assertEqual(match.get("version"), "0.7.4")
+            expected_version = json.loads(TARGET_MANIFEST.read_text(encoding="utf-8"))["version"]
+            self.assertEqual(match.get("version"), expected_version)
             self.assertTrue(match.get("enabled"))
             agents_val = match.get("agents")
             agents_count = len(agents_val) if isinstance(agents_val, list) else agents_val
             self.assertEqual(agents_count, 15)
             skills_val = match.get("skills")
             skills_count = len(skills_val) if isinstance(skills_val, list) else skills_val
-            self.assertEqual(skills_count, 28)
+            self.assertEqual(skills_count, len(EXPECTED_SKILLS))
 
     @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_07_agy_agents_discovery(self):

@@ -1,6 +1,6 @@
 ---
 name: explorer
-description: "Story lore and knowledge base explorer. Performs deep read sweeps across project files, canon documents, and character files to answer story questions without editing files."
+description: "Finds evidence for a question within a clearly assigned area of project files and history. Returns facts with file paths, line references, and snippets so the caller can read what matters. Writes no files."
 model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false

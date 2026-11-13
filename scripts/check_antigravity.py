@@ -6,9 +6,9 @@ for creative-writing-skills Google Antigravity 2.0 native plugin.
 
 Checks:
 1. Manifest Integrity (plugin.json RFC 8259, kebab-case, semver, bounds)
-2. Agent Topology & Model Policy (15 agents, muse: inherit, 14 subagents: flash,
+2. Agent Topology & Model Policy (15 agents, muse and 5 specialists: inherit, 9: flash,
    sandbox policy, mainAgent/subagent flags, role prompt constraints)
-3. Skill Completeness (28 skills, SKILL.md names match folders, descriptions,
+3. Skill Completeness (27 skills, SKILL.md names match folders, descriptions,
    body size <= 24,000 bytes, zero dangling resource links, key resources)
 4. Rules Conformance (story-project.md: model_decision, kb-pages.md: glob, body <= 24KB)
 5. Hooks & Safety Guards (hooks.json structure, git_guard.py executable chmod 0755)
@@ -51,6 +51,7 @@ EXPECTED_AGENTS = [
 ]
 
 ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
+INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -81,7 +82,6 @@ EXPECTED_SKILLS = [
     "creative-writing-craft",
     "creative-writing-muse",
     "grill",
-    "grill-with-docs",
     "information-hierarchy",
     "intent-modeling",
     "knowledge-layers",
@@ -278,14 +278,14 @@ class Checker:
             if not fm.get("description"):
                 self.error(f"Agent {agent_name}: missing or empty description")
 
-            # Model policy: muse = inherit, all 14 subagents = flash
+            # Creative judgment follows the caller's model; other specialists use Flash.
+            expected_model = "inherit" if agent_name in INHERIT_MODEL_AGENTS else "flash"
+            configured_model = expected_agents_table.get(agent_name, {}).get("model", default_model)
+            if configured_model != expected_model:
+                self.error(f"Agent {agent_name}: configured model must be '{expected_model}', got '{configured_model}'")
             model = fm.get("model")
-            if agent_name == "muse":
-                if model != "inherit":
-                    self.error(f"Agent muse: model must be 'inherit', got '{model}'")
-            else:
-                if model != "flash":
-                    self.error(f"Subagent {agent_name}: model must be 'flash', got '{model}'")
+            if model != expected_model:
+                self.error(f"Agent {agent_name}: generated model must be '{expected_model}', got '{model}'")
 
             # Tools permission whitelist validation
             tools = fm.get("tools")
@@ -524,8 +524,8 @@ class Checker:
             components = report.get("components", {})
             if components.get("agents") != 15:
                 self.error(f"`agy validate` discovered {components.get('agents')} agents, expected 15")
-            if components.get("skills") != 28:
-                self.error(f"`agy validate` discovered {components.get('skills')} skills, expected 28")
+            if components.get("skills") != len(EXPECTED_SKILLS):
+                self.error(f"`agy validate` discovered {components.get('skills')} skills, expected {len(EXPECTED_SKILLS)}")
         except json.JSONDecodeError:
             self.error("Failed to parse JSON report from `agy plugin validate`")
 

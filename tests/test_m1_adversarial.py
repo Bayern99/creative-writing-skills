@@ -244,7 +244,9 @@ class TestAdversarialJsonStrictness(unittest.TestCase):
         parsed = json.loads(raw_text)
         self.assertIsInstance(parsed, dict)
         self.assertEqual(parsed["name"], "creative-writing-skills")
-        self.assertEqual(parsed["version"], "0.7.4")
+        with open(REPO_ROOT / "mars.toml", "rb") as source:
+            expected_version = tomllib.load(source)["package"]["version"]
+        self.assertEqual(parsed["version"], expected_version)
 
     def test_strict_rejection_of_comments(self):
         """Standard JSON parsers must reject single-line and multi-line comments."""
@@ -331,17 +333,19 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
             f"User directive violation: muse model must be 'inherit', found '{muse.get('model')}'"
         )
 
-    def test_all_14_subagents_are_strictly_flash(self):
-        """User directive: all 14 subagents must be configured to 'flash'."""
+    def test_subagents_follow_role_model_policy(self):
+        """Creative judgment roles inherit; the nine other specialists use flash."""
         agents = self.config["agents"]
         for name, cfg in agents.items():
             if name == "muse":
                 continue
             model = cfg.get("model", self.config.get("defaults", {}).get("model"))
+            inherited = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
+            expected = "inherit" if name in inherited else "flash"
             self.assertEqual(
                 model,
-                "flash",
-                f"User directive violation: agent '{name}' model must be 'flash', found '{model}'"
+                expected,
+                f"Model policy violation: agent '{name}' must use '{expected}', found '{model}'"
             )
 
     def test_agent_tools_allowlists(self):
