@@ -334,13 +334,14 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
         )
 
     def test_subagents_follow_role_model_policy(self):
-        """Every child stays on Flash; none inherits the main session model."""
+        """Creative judgment roles inherit; the nine other specialists use flash."""
         agents = self.config["agents"]
         for name, cfg in agents.items():
             if name == "muse":
                 continue
             model = cfg.get("model", self.config.get("defaults", {}).get("model"))
-            expected = "flash"
+            inherited = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
+            expected = "inherit" if name in inherited else "flash"
             self.assertEqual(
                 model,
                 expected,

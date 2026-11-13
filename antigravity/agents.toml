@@ -1,9 +1,7 @@
 # antigravity/agents.toml
 # Source configuration for building Antigravity 2.0 agents from plugin/claude/agents/
-# Muse uses the author-selected main model; child agents must not inherit it.
-# Target: five fixed Hydrogen specialists + nine fixed Flash specialists.
-# Native agent tiers cannot pin Hydrogen independently yet; all 14 children use
-# Flash as an interim restoration of the pre-inheritance configuration.
+# Muse uses the author-selected main model; five specialists inherit that choice.
+# Inherited specialists follow the calling agent's model when that selection changes.
 
 [defaults]
 commandExecutionPolicy = "sandbox"
@@ -71,7 +69,7 @@ subagents = [
 ]
 
 [agents.writer]
-model = "flash"
+model = "inherit"
 mainAgent = true
 subagent = true
 role = "producer"
@@ -97,7 +95,7 @@ optional_skills = [
 ]
 
 [agents.critic]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "reviewer"
@@ -119,7 +117,7 @@ optional_skills = [
 ]
 
 [agents.outliner]
-model = "flash"
+model = "inherit"
 mainAgent = true
 subagent = true
 role = "planner"
@@ -140,7 +138,7 @@ skills = [
 ]
 
 [agents.style-creator]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "producer"
@@ -262,7 +260,7 @@ skills = [
 ]
 
 [agents.kb-lead]
-model = "flash"
+model = "inherit"
 mainAgent = false
 subagent = true
 role = "lead"

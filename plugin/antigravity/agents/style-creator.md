@@ -1,7 +1,7 @@
 ---
 name: style-creator
 description: "Voice and style analyst that inspects prose samples and author notes to formulate concrete narrative voice rules, cadence guides, vocabulary preferences, and style constraints."
-model: flash
+model: inherit
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true

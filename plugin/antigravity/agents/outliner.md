@@ -1,7 +1,7 @@
 ---
 name: outliner
 description: "Structural story architect and beat sheet planner. Transforms creative vision and premise into cohesive narrative arcs, act breakdowns, chapter beat outlines, and scene structures."
-model: flash
+model: inherit
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: true

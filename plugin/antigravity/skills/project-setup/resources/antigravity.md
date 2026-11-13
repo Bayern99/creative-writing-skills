@@ -37,11 +37,9 @@ In Antigravity, four primary entry points are exposed in the Agent dropdown:
 - **`character-sim`**: Interactive in-character conversational partner for voice discovery.
 - **`outliner`**: Dedicated story architect for outline generation.
 
-Choose any available main-session model in the picker. The intended allocation is fixed Hydrogen for `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead`, and fixed Flash for the other nine specialists, independently of your main model. When you select writer, character-sim, or outliner directly as the primary agent, choose that session's model in the picker too.
+Choose any available model in the main conversation's model picker. The five specialists `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine use `model: flash` for Gemini 3.8 Flash. Inherited children follow the calling agent's model, so choosing another main model changes them too. When you select writer, character-sim, or outliner directly as the primary agent, choose that session's model in the picker.
 
-The current ordinary native configuration uses `model: flash` for all 14 children as an explicit interim. The [documented tiers](https://antigravity.google/docs/build-plugins) do not support an independent concrete Hydrogen selection; see [issue #1270](https://github.com/google-antigravity/antigravity-cli/issues/1270). A task requiring Hydrogen must be reported as blocked before dispatch, with Flash used only if the author accepts it. No child inherits the main model.
-
-Official [Swarm](https://antigravity.google/docs/swarm) can select worker models independently, but this plugin has no Swarm integration. The workflow below uses ordinary native subagents.
+The plugin uses the [documented model tiers](https://antigravity.google/docs/build-plugins). For example, choosing Hydrogen makes the five inherited specialists use Hydrogen. [Orchestrator](https://antigravity.google/docs/models) has a separate planning/execution configuration.
 
 To launch in CLI:
 ```bash
