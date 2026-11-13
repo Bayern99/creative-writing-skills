@@ -15,13 +15,17 @@ The system operates as a tiered hub-and-spoke hierarchy:
 
 ---
 
-## 2. Model Tier Allocation
+## 2. Model Policy and Current Support
 
-- **Main session**: The author selects the model for `muse` in Antigravity's model picker. Recommend standalone **Gemini 4 Hydrogen** for the Hydrogen + Flash configuration.
-- **Inherited specialists**: `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit` for prose, critique, structure, voice, and knowledge judgments.
-- **Flash specialists**: `brainstormer`, `character-sim`, `continuity-checker`, `reader-sim`, `creative-researcher`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer` use `model: flash`.
+- **Main session**: The author freely selects the model for `muse` in Antigravity's model picker. Muse is main-agent-only (`subagent: false`).
+- **Intended Hydrogen specialists**: `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` should use fixed Gemini 4 Hydrogen independently of the main model.
+- **Flash specialists**: `brainstormer`, `character-sim`, `continuity-checker`, `reader-sim`, `creative-researcher`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer` use `model: flash` for Gemini 3.8 Flash.
 
-`inherit` selects the calling agent's model; it is not an independent Hydrogen pin. Changing the main model changes the inherited specialists too. Flash currently resolves to Gemini 3.8 Flash. Inspect the resolved child model when verifying a run, and report the observed model rather than inferring it from the role name. See [plugin model tiers](https://antigravity.google/docs/build-plugins) and [model selection](https://antigravity.google/docs/models).
+The ordinary native path currently accepts [model tiers](https://antigravity.google/docs/build-plugins), and `agy` 1.5.8 rejects concrete Hydrogen IDs in agent frontmatter. See the [repository collaborator's tier explanation](https://github.com/google-antigravity/antigravity-cli/issues/1270). All 14 specialists therefore use `model: flash` as the explicit interim configuration; no child inherits its caller's model. Do not treat `pro` as a Hydrogen alias.
+
+Before a Hydrogen-required dispatch, report that fixed Hydrogen is blocked on this path. Use Flash for that task only if the author accepts the interim choice. Inspect and report the resolved model when verifying an actual run.
+
+Official [Swarm](https://antigravity.google/docs/swarm) supports independently selected worker models. This plugin has no Swarm integration; its current lifecycle and permissions use ordinary native subagents.
 
 ---
 
@@ -29,7 +33,7 @@ The system operates as a tiered hub-and-spoke hierarchy:
 
 ### Native Call Schema
 Per the official Antigravity Hooks and Subagents documentation, `invoke_subagent` accepts a `Subagents` array where each entry defines `TypeName`, `Role`, `Prompt`, and optional `Workspace` (`inherit`, `branch`, or `share`).
-Use each bundled agent's `model: inherit` or `model: flash` frontmatter for the role allocation above. The examples use the fields documented in the [Hooks reference](https://antigravity.google/docs/hooks). Follow the active runtime's tool schema for any additional parameters; keep model slugs out of these tier-based examples.
+These examples use the current `model: flash` child frontmatter and the fields documented in the [Hooks reference](https://antigravity.google/docs/hooks). `Workspace: "inherit"` controls the workspace, not the model. Apply the Hydrogen-required dispatch check above before calling the tool. Follow the active runtime's schema for any additional parameters; the examples do not supply a concrete model override.
 
 ### Parallel Review Lanes
 When a draft is ready for review, `muse` spawns multiple review lanes concurrently in a single tool call:

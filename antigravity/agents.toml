@@ -1,7 +1,9 @@
 # antigravity/agents.toml
 # Source configuration for building Antigravity 2.0 agents from plugin/claude/agents/
-# Select Gemini 4 Hydrogen in the main session for Hydrogen + Flash routing.
-# Inherited specialists follow the calling agent's model when that selection changes.
+# Muse uses the author-selected main model; child agents must not inherit it.
+# Target: five fixed Hydrogen specialists + nine fixed Flash specialists.
+# Native agent tiers cannot pin Hydrogen independently yet; all 14 children use
+# Flash as an interim restoration of the pre-inheritance configuration.
 
 [defaults]
 commandExecutionPolicy = "sandbox"
@@ -69,7 +71,7 @@ subagents = [
 ]
 
 [agents.writer]
-model = "inherit"
+model = "flash"
 mainAgent = true
 subagent = true
 role = "producer"
@@ -95,7 +97,7 @@ optional_skills = [
 ]
 
 [agents.critic]
-model = "inherit"
+model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
@@ -117,7 +119,7 @@ optional_skills = [
 ]
 
 [agents.outliner]
-model = "inherit"
+model = "flash"
 mainAgent = true
 subagent = true
 role = "planner"
@@ -138,7 +140,7 @@ skills = [
 ]
 
 [agents.style-creator]
-model = "inherit"
+model = "flash"
 mainAgent = false
 subagent = true
 role = "producer"
@@ -260,7 +262,7 @@ skills = [
 ]
 
 [agents.kb-lead]
-model = "inherit"
+model = "flash"
 mainAgent = false
 subagent = true
 role = "lead"

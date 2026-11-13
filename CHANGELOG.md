@@ -4,7 +4,8 @@
 
 ### Antigravity fork
 - Sync the native plugin with upstream 0.7.7 and meridian-base 0.15.1: topic-based choice capture, `/grill`, source-passage session mining, and updated knowledge maintenance.
-- Let Writer, Critic, Outliner, Style Creator, and KB Lead inherit the selected main model; keep the other nine specialists on the Flash tier. Select standalone Gemini 4 Hydrogen for Hydrogen + Flash operation.
+- Correct the model allocation: keep Muse freely selectable and restore all 14 subagents to Flash as an explicit interim configuration. Remove the five inherited child-model settings, which coupled specialist models to the main session.
+- Record the intended independent allocation: fixed Hydrogen for Writer, Critic, Outliner, Style Creator, and KB Lead; fixed Flash for the other nine. Fixed Hydrogen remains blocked on the ordinary native tier-only path; report Hydrogen-required dispatches before running an alternative. Swarm supports independent worker models but is not integrated with this plugin.
 - Document the App's Software Engineering layout and Overview > Subagents controls for following native child conversations.
 - Match upstream's Mars 0.27.4 builder and regenerate Antigravity after Mars in CI and pre-commit checks, before comparing the complete plugin tree.
 

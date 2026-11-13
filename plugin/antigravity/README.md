@@ -13,19 +13,23 @@ A native Antigravity plugin with 15 agents and 27 skills for writing fiction.
 
 Agents use Antigravity's native `invoke_subagent` and `send_message` tools, with dedicated prompts, tool permissions, and skill bundles. `/project-setup` establishes the story project; `/story-workflow` guides work through planning, drafting, review, and knowledge capture.
 
-## Model Selection: Hydrogen + Flash
+## Model Selection and Current Support
 
-Select **Gemini 4 Hydrogen** in the main conversation's model picker for this combination:
+Choose any available model for **Muse** in the main conversation. The intended specialist allocation is independent of that choice:
 
-| Agents | Configuration | Purpose |
+| Agents | Intended model | Current native configuration |
 | --- | --- | --- |
-| `muse` | Main conversation selection | Creative direction, drafting, delegation, final judgment |
-| `writer`, `critic`, `outliner`, `style-creator`, `kb-lead` | `model: inherit` | Prose, editorial judgment, structure, voice, and knowledge decisions |
-| The other 9 specialists | `model: flash` | Focused research, simulation, retrieval, checks, and structural maintenance |
+| `muse` | Author's selected main-session model | Main agent only; follows the model picker |
+| `writer`, `critic`, `outliner`, `style-creator`, `kb-lead` | Fixed Gemini 4 Hydrogen | `model: flash` temporarily; fixed Hydrogen is blocked |
+| The other 9 specialists | Fixed Gemini 3.8 Flash | `model: flash` |
 
-`inherit` follows the calling agent's model. With Hydrogen selected, those five specialists use Hydrogen; changing the parent model changes their inherited model too. This configuration does not pin Hydrogen independently of the parent. The Flash tier targets Gemini 3.8 Flash in the current service; inspect the resolved model in a subagent's details when checking routing.
+**All 14 subagents currently use the Flash tier as an explicit interim configuration.** This restores their earlier routing while keeping the requested Hydrogen allocation visible as pending. No child inherits the main model. Muse's `model: inherit` applies to its main-agent definition with `subagent: false`.
 
-The [plugin schema](https://antigravity.google/docs/build-plugins) accepts model tiers (`inherit`, `flash_lite`, `flash`, `pro`), while the [model picker](https://antigravity.google/docs/models) selects the primary model. Orchestrator has its own planning/execution routing; choose standalone Hydrogen for the combination above.
+The ordinary native [plugin schema](https://antigravity.google/docs/build-plugins) accepts only `inherit`, `flash_lite`, `flash`, and `pro`; `agy` 1.5.8 rejects a concrete Hydrogen ID in agent frontmatter. The [repository collaborator's explanation in issue #1270](https://github.com/google-antigravity/antigravity-cli/issues/1270) describes this tier restriction. `pro` is not a verified Hydrogen alias. Inspect the resolved child model when checking a run.
+
+If a task requires Hydrogen, report that the current native path cannot provide the requested model **before dispatch**. Run it on Flash only if the author accepts that interim choice.
+
+Official [Swarm](https://antigravity.google/docs/swarm) supports selecting worker models independently of the coordinator. This plugin continues to use ordinary native subagents; a Swarm integration has not been implemented or verified.
 
 ---
 
@@ -33,14 +37,14 @@ The [plugin schema](https://antigravity.google/docs/build-plugins) accepts model
 
 Muse is the main creative partner; it can delegate to 14 specialists. Writer, character-sim, and outliner are also available as primary agents. When you select one directly, choose its session model in the app; the tier column below applies to delegated work.
 
-| Agent | Delegated tier | Responsibility |
+| Agent | Current delegated tier | Responsibility |
 | --- | --- | --- |
 | `muse` | Main agent only | Discussion, plans, drafts, and final verdicts |
-| `writer` | `inherit` | Drafts, revisions, bridges, alternate takes, and line polish |
-| `outliner` | `inherit` | Narrative arcs, chapter beats, and scene structures |
-| `critic` | `inherit` | Editorial diagnosis with findings anchored to the draft |
-| `style-creator` | `inherit` | Concrete voice and style guidance from prose samples |
-| `kb-lead` | `inherit` | Writes settled knowledge, deletes stale content, and reorganizes affected pages |
+| `writer` | `flash` (interim) | Drafts, revisions, bridges, alternate takes, and line polish |
+| `outliner` | `flash` (interim) | Narrative arcs, chapter beats, and scene structures |
+| `critic` | `flash` (interim) | Editorial diagnosis with findings anchored to the draft |
+| `style-creator` | `flash` (interim) | Concrete voice and style guidance from prose samples |
+| `kb-lead` | `flash` (interim) | Writes settled knowledge, deletes stale content, and reorganizes affected pages |
 | `character-sim` | `flash` | Character voice, motivation, and dialogue simulation |
 | `continuity-checker` | `flash` | Canon, character-state, and timeline checks |
 | `reader-sim` | `flash` | First-read reactions, clarity, suspense, and payoff |
@@ -93,7 +97,7 @@ In your project directory, run:
 Answer the setup interview questions. The skill will scaffold your `AGENTS.md` and initial `kb/` directory hierarchy (`characters/`, `world/`, `timeline/`, `styles/`).
 
 ### 2. Launch Muse
-In Antigravity Desktop App, select **`muse`** from the Agent dropdown and **Gemini 4 Hydrogen** from the model picker. In CLI:
+In Antigravity Desktop App, select **`muse`** from the Agent dropdown and choose your preferred session model in the model picker. In CLI:
 ```bash
 agy --agent muse
 ```

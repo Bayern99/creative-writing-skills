@@ -61,11 +61,19 @@ Mars 0.27.4 owns and replaces the whole `plugin/` output directory. When buildin
 both distributions, run Mars first and the Antigravity generator second, then
 compare the complete generated tree. CI and the pre-commit hook use that order.
 
-The model policy is `inherit` for Muse, Writer, Critic, Outliner, Style Creator,
-and KB Lead, and `flash` for the other nine specialists. Select standalone
-Gemini 4 Hydrogen in the main conversation for Hydrogen + Flash operation;
-changing the main model also changes inherited specialists. Use native
-`invoke_subagent` conversations with the documented tier values.
+The author's model policy is independent routing: Muse uses the freely selected
+main-session model; Writer, Critic, Outliner, Style Creator, and KB Lead should
+use fixed Hydrogen; the other nine specialists should use fixed Flash. No child
+inherits the main model. Muse alone keeps `model: inherit` with `subagent: false`.
+
+The ordinary native subagent path currently accepts tiers and cannot pin Hydrogen
+independently. All 14 children therefore retain `model: flash` as the explicit
+interim configuration. Report a Hydrogen-required dispatch as blocked before
+starting it; use Flash for that task only if the author accepts the interim
+choice. Do not treat `pro` as a Hydrogen alias. See [the tier restriction](https://github.com/google-antigravity/antigravity-cli/issues/1270).
+Official [Swarm](https://antigravity.google/docs/swarm) supports independently
+selected worker models, but this plugin has no Swarm integration. Keep the
+current native `invoke_subagent` workflow until a separate integration is verified.
 
 The Antigravity adaptation keeps Writer available for fresh drafts and revisions
 as well as alternate takes, polish, and long drafts; keep its guides aligned with

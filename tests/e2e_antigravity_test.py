@@ -3,8 +3,8 @@
 
 Current Requirements & Specifications:
 - Native Antigravity configuration:
-    * Model policy: muse and 5 creative judgment specialists = inherit; 9 others = flash.
-      Selecting Hydrogen in the main session gives the Hydrogen + Flash combination.
+    * Interim model policy: main-only muse = inherit; all 14 children = flash.
+      Independent Hydrogen pins remain pending native support or an adapted dispatch path.
     * Subagents differentiated by specialized system prompt and skill bundles.
     * 0 errors and 0 warnings with `agy plugin validate --strict`.
     * Native multi-agent orchestration via `invoke_subagent`.
@@ -83,7 +83,7 @@ EXPECTED_AGENTS = [
 ]
 
 ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
-INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
+INHERIT_MODEL_AGENTS = {"muse"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -375,7 +375,7 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
         )
 
     def test_t1_09_subagent_models_match_role_policy(self):
-        """Configured and generated specialists preserve the inherit/Flash role split."""
+        """Configured and generated children stay on Flash regardless of Muse selection."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         defaults = config.get("defaults", {})

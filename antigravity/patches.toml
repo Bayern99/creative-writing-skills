@@ -45,7 +45,9 @@ replace = """## Model Selection & Multi-Agent Dispatch
 
 In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
 
-The author selects the primary session model in the App/CLI. `muse` and the five specialists `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. Select standalone Gemini 4 Hydrogen for a Hydrogen + Flash workflow. If the author selects a different main model, the inherited specialists follow that model. The `flash` tier is resolved by Antigravity; check the actual child model in the running session.
+The author freely selects Muse's primary session model in the App/CLI. Child model choices are independent of that selection. The intended allocation is fixed Hydrogen for `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead`, and fixed Flash for the other nine specialists. Ordinary native custom agents currently accept only model tiers and cannot pin Hydrogen independently. All 14 bundled children therefore use `model: flash` as an interim restoration of the previous configuration; no child uses `model: inherit`.
+
+If the author requires Hydrogen for a task, report that ordinary native dispatch cannot currently provide that pin before dispatching; do not silently substitute Flash or the parent's model. Do not override a bundled child's tier with `inherit`. Check the resolved model in the running session. Native Swarm supports separately chosen worker models, but its integration with these custom roles is pending; see the dispatch guide.
 
 **Parallel lanes**: In `invoke_subagent`, you can pass multiple subagent definitions in a single call (e.g. structure, voice, and character critics) to run concurrently.
 

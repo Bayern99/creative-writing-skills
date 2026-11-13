@@ -1,7 +1,7 @@
 ---
 name: writer
 description: "Writes production prose in one mode: fresh draft, revision, bridge, alternate take, or line polish. Pass the brief or revision notes, the mode, the target path, and the style, character-state and canon files; returns the mode used, the judgment calls it made, and any contradiction with character state."
-model: inherit
+model: flash
 commandExecutionPolicy: sandbox
 mainAgent: true
 subagent: true

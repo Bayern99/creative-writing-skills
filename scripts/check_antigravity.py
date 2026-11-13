@@ -6,7 +6,7 @@ for creative-writing-skills Google Antigravity 2.0 native plugin.
 
 Checks:
 1. Manifest Integrity (plugin.json RFC 8259, kebab-case, semver, bounds)
-2. Agent Topology & Model Policy (15 agents, muse and 5 specialists: inherit, 9: flash,
+2. Agent Topology & Model Policy (15 agents, main-only muse: inherit, all 14 children: flash,
    sandbox policy, mainAgent/subagent flags, role prompt constraints)
 3. Skill Completeness (27 skills, SKILL.md names match folders, descriptions,
    body size <= 24,000 bytes, zero dangling resource links, key resources)
@@ -51,7 +51,7 @@ EXPECTED_AGENTS = [
 ]
 
 ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
-INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
+INHERIT_MODEL_AGENTS = {"muse"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -278,7 +278,7 @@ class Checker:
             if not fm.get("description"):
                 self.error(f"Agent {agent_name}: missing or empty description")
 
-            # Creative judgment follows the caller's model; other specialists use Flash.
+            # Only the main entry uses the session model; children never inherit it.
             expected_model = "inherit" if agent_name in INHERIT_MODEL_AGENTS else "flash"
             configured_model = expected_agents_table.get(agent_name, {}).get("model", default_model)
             if configured_model != expected_model:

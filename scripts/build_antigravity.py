@@ -8,7 +8,7 @@ plugin at plugin/antigravity/.
 Pipeline:
 1. Validates and copies package metadata from mars.toml into plugin.json
 2. Transforms 15 agents from plugin/claude/agents/*.md using antigravity/agents.toml
-   (applying role-specific inherit/flash models, sandbox policy, role constraints)
+   (applying a selectable main model and fixed child tiers, sandbox policy, role constraints)
 3. Copies and transforms all 27 skills from plugin/claude/skills/*
    (rewriting /creative-writing-skills:<skill> -> /<skill>, stripping Claude artifacts)
 4. Applies antigravity/patches.toml with strict SHA-256 integrity verification

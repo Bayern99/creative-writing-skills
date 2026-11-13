@@ -1,7 +1,7 @@
 ---
 name: kb-lead
 description: "Maintains the story knowledge base after a change settles. Reads the supplied decisions and evidence, writes updates, deletes stale or redundant content, and reorganizes the pages it touches. Delegates scoped retrieval and whole-tree structural maintenance; reports deletions, additions, contradictions, and gaps."
-model: inherit
+model: flash
 commandExecutionPolicy: sandbox
 mainAgent: false
 subagent: true

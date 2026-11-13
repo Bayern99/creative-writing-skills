@@ -58,7 +58,7 @@ agy agents
 **First session workflow**:
 1. In your project directory, run `/project-setup` in Antigravity to create your `AGENTS.md`, `kb/` layout, and voice styles.
 2. Start writing with `muse`. Muse acts as your orchestrator and primary creative partner, using `invoke_subagent` to spawn specialized subagents (`critic`, `reader-sim`, `continuity-checker`, `writer`, `kb-lead`) in independent parallel contexts.
-3. **Model Strategy**: Choose the main model in the Desktop App or CLI. `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. Select standalone Gemini 4 Hydrogen for Hydrogen + Flash operation. Switching the main model also switches inherited specialists. See the [Antigravity guide](plugin/antigravity/README.md) for routing and subagent visibility settings.
+3. **Model Strategy**: Choose any available main-session model in the Desktop App or CLI. All 14 specialists currently use `model: flash` as an explicit interim configuration. The intended allocation is fixed Hydrogen for `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead`, and fixed Flash for the other nine, independently of the main model. The ordinary native subagent path currently accepts model tiers and cannot pin Hydrogen separately; a task requiring Hydrogen must be reported as blocked before dispatch, rather than silently run on Flash. See the [Antigravity guide](plugin/antigravity/README.md) for the support status and subagent visibility settings.
 
 ### Mars (meridian-cli)
 
