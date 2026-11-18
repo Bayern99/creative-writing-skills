@@ -4,7 +4,7 @@
 
 检查基线为 fork 的 main，提交 f821366（0.9.5）。Mars 把代理与技能编译给不同宿主，Claude Code 版有具名代理。作者面对的 Muse 只在代理定义里声明职责、可用技能和可委派对象；实际流程写在技能里。因此移植时要沿着代理、技能和交接材料三层一起读。[Muse 定义](https://github.com/Bayern99/creative-writing-skills/blob/f821366/agents/muse.md) · [生命周期](https://github.com/Bayern99/creative-writing-skills/blob/f821366/skills/story-workflow/SKILL.md)
 
-| main 中的职责 | 自用 Codex 版如何执行 |
+| main 中的职责 | Codex 版如何执行 |
 | --- | --- |
 | Muse 判断意图、区分已定与暂定、直接起草，拥有编辑裁决。作者决定方向与口味 | 当前会话担任 Muse。讨论和一般起草在本轮完成，冲突的专业意见由它回到文本核验 |
 | Spark 轻量单人工作。Setup 由作者发起，先访谈再提案和写入 | 单人模式由 Muse 接受自然语言指定。初始化保留独立的 project-setup 入口 |

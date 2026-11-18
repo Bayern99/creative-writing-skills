@@ -1,18 +1,19 @@
-# Creative Writing Skills · Codex 自用版
+# Creative Writing Skills · Codex 插件
 
 把插件装一次，然后在自己的小说项目里开 Codex 会话。可以从一句梗概、一段试写或已有的长篇开始。插件自带写作参考资料，安装时无需连接外部应用。
 
-## 安装
+## 从 GitHub 安装
 
-将整个 ZIP 解压到准备长期保留的位置。在包含本说明和 `.agents/` 的目录打开终端，运行以下命令。使用支持 `codex plugin` 的 Codex CLI。
+在任意目录用支持 `codex plugin` 的 Codex CLI 运行以下命令。第一条注册本 fork 的写作插件源，第二条安装插件。
 
 ```sh
-codex plugin marketplace add .
+codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
 codex plugin add creative-writing-skills@bayern-writing
-codex plugin list --marketplace bayern-writing
 ```
 
-从本地 Git 分支使用时也可以在仓库根目录运行这三条命令。打开自己的小说项目，新建 Codex 会话。在技能选择器中输入 `$`，选择下列技能之一。如果桌面端已经打开，重启后再看插件目录，来源名为 **Bayern · 写作工具**。
+以前从 ZIP 注册过 `bayern-writing` 的用户，可以先运行 `codex plugin marketplace remove bayern-writing`，再执行上面两条命令，切换到 GitHub 更新源。
+
+打开自己的小说项目，新建 Codex 会话。在技能选择器中输入 `$`，选择下列技能之一。插件目录里的来源名为 **Bayern · 写作工具**。
 
 | 入口 | 可以直接试的话 |
 | --- | --- |
@@ -27,11 +28,20 @@ codex plugin list --marketplace bayern-writing
 
 在小说项目里显式选 `$creative-writing-muse`。可以直接说：“第一章是定稿。请给第二章做一次独立的跨章连续性核查，也单独看看线索递给读者时会不会太早。我只要审稿，附一句你实际怎么分工的。” Muse 在当前会话执笔和裁决，按任务给通用子代理交代角色、可见材料和交付物。写短段或说“这次你自己看”时，留在当前会话就能完成。
 
-四个入口都需要显式选用。安装只登记本地市场和插件启用状态。模型、推理强度、权限、审批、并发上限和项目的 `.codex/` 沿用现有设置。宿主无法委派时，Muse 会说明哪些工作由同一会话分次完成。首次试读的材料边界由简报和独立上下文控制；受托子代理继承当前工作区的文件权限。
+四个入口都需要显式选用。安装登记插件源和插件启用状态。模型、推理强度、权限、审批、并发上限和项目的 `.codex/` 沿用现有设置。宿主无法委派时，Muse 会说明哪些工作由同一会话分次完成。首次试读的材料边界由简报和独立上下文控制；受托子代理继承当前工作区的文件权限。
 
 上游分工、Codex 映射、一次真实的子代理运行和可复用的两章样本见[工作流验证记录](docs/codex-workflow/README.md)。
 
-## 打包和维护
+## 从 GitHub 更新
+
+```sh
+codex plugin marketplace upgrade bayern-writing
+codex plugin add creative-writing-skills@bayern-writing
+```
+
+新开会话后即可使用。运行 `codex plugin list --marketplace bayern-writing` 可查看安装状态。
+
+## 本地安装与打包
 
 独立包位于 `plugins/creative-writing-skills/`，源目录可以直接编辑。本地目录清单是 `.agents/plugins/marketplace.json`。发新版时更新插件自己的 `plugin.json` 版本号，提交后在仓库根目录打包：
 
@@ -39,6 +49,6 @@ codex plugin list --marketplace bayern-writing
 git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-codex.zip HEAD .agents/plugins/marketplace.json plugins/creative-writing-skills CODEX.zh-CN.md docs/codex-workflow
 ```
 
-更新自用安装时，把新版解压到原来的插件源位置，再运行安装命令并新建会话。
+从 ZIP 或本地检出安装时，在包含本说明和 `.agents/` 的目录运行 `codex plugin marketplace add .`，再运行 `codex plugin add creative-writing-skills@bayern-writing`。
 
 本版基于 Jimmy Yao 的 Creative Writing Skills 0.9.5（Apache-2.0）。随包的三篇英文参考资料保留原文。同步上游时，可把 `skills/creative-writing-craft/resources/` 里的 `prose-writing.md` 和 `style-analysis.md` 更新到 Muse 的 `references/`，把 `skills/story-review/resources/editorial-review.md` 更新到审稿技能的 `references/`。许可证在包内的 `LICENSE`。

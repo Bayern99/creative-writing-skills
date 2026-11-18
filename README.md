@@ -30,7 +30,14 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ### Codex
 
-This fork includes a local Codex marketplace with four fiction workflows for drafting, project setup, review, and story memory. From this branch or the extracted personal package, follow the [Codex installation guide and Chinese examples](CODEX.zh-CN.md).
+Install this fork’s writing plugin directly from GitHub with the Codex CLI:
+
+```sh
+codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
+codex plugin add creative-writing-skills@bayern-writing
+```
+
+Open your fiction project in a new Codex session and select `$creative-writing-muse` to start. The [Chinese guide](CODEX.zh-CN.md) covers project setup, review, story memory, and updates.
 
 ### Mars (meridian-cli)
 
