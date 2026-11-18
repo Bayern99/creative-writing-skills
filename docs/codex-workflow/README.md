@@ -12,7 +12,7 @@
 | Critic 每人负责一种编辑层级或一个问题。连续性核查跨章节。Reader-sim 受读者可知信息限制 | 可并行核查同一稿件，再依次修订和试读。同一批报告算一轮，评读加修订满两轮就交还作者 |
 | KB lead 在作品或决定已定时接手。试写与作者裁定分开 | 明确指出被接受的版本和授权的目标页。沿用已有条目；单独的审稿请求在审稿报告结束 |
 
-原项目的生产者和审稿人简报规定了发什么、收什么；写作上下文指南还区分哪些角色需要前情、哪些角色只应看选出的资料。本版把这些规则放进 Muse 随包的分工说明。Meridian 的模型策略、跨提供商调度、知识库整树重组和外部同步超出本次改编与测试范围。[生产者](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/producers.md) · [审稿人](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/reviewers.md) · [交接材料](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/story-memory/resources/story-context.md) · [Codex 分工说明](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/writing-staffing.md)
+原项目的生产者和审稿人简报规定了发什么、收什么；写作上下文指南还区分哪些角色需要前情、哪些角色只应看选出的资料。本版把这些规则放进 Muse 随包的分工说明。下述两章测试覆盖原生 Codex 分工。模型路由另见本文末的专项验证。[生产者](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/producers.md) · [审稿人](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/reviewers.md) · [交接材料](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/story-memory/resources/story-context.md) · [Codex 分工说明](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/writing-staffing.md)
 
 ## 两种运行分别验证了什么
 
@@ -41,3 +41,9 @@
 **归档复测。** 同一份定稿和裁定在重新安装的技能上只新增了一条第二章记录，保留船票及折角记忆，放票人和是否开船都留白。再用相同输入执行一次，返回零项增量，归档文件的 SHA-256 校验一致。[实际归档结果](canon-after.md)
 
 **单人和两轮上限。** 另开一个 Muse 会话，给它 v2，并把“已完成两轮，本次你自己看，只说口味取舍”作为测试前提。该会话没有派子代理，只问结尾希望读者更惦记母亲还是水渍。这验证了到达上限时的行为；测试没有让宿主从零连续生成两轮修订。
+
+## 角色和模型专项验证
+
+- 对照上游 0.9.5 的 12 个创作角色、Mars 锁定的 5 个 meridian-base 角色和 17 份 Claude 构建定义，逐文件核验，并检查这些角色声明的核心及可选技能都能在安装目录中找到。四个 Codex 入口按需读取 24 份技能及其材料。
+- 在临时项目中使用 Meridian 0.23.4 载入原始 critic 和 creative-researcher profile，分别运行 spawn 的 dry-run。解析记录的首选分别是 opus 和 luna；critic 的 opus 在 Claude 路径返回 not_installed，在 Codex 路径返回 provider_constraint_unsatisfied。两次均返回 model_candidates_exhausted，实际模型调用次数为零。
+- 在新的 Codex 子会话中直接读取已安装的 Muse，给出“只接受 critic 的 Opus / high，只允许原生工具”的请求。该会话核对 critic 配置，指出宿主支持 high、没有 Opus，并将审稿留待有相应模型的环境执行。这是对严格模型条件的行为验证。Opus、Sonnet 的真实生成和两家提供商的交叉复核仍需在有相应运行时的项目中实测。

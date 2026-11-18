@@ -33,7 +33,19 @@ codex plugin marketplace remove bayern-writing
 
 在小说项目里显式选 `$creative-writing-muse`。可以直接说：“第一章是定稿。请给第二章做一次独立的跨章连续性核查，也单独看看线索递给读者时会不会太早。我只要审稿，附一句你实际怎么分工的。” Muse 在当前会话执笔和裁决，按任务给通用子代理交代角色、可见材料和交付物。写短段或说“这次你自己看”时，留在当前会话就能完成。
 
-四个入口都需要显式选用。安装登记插件源和插件启用状态。模型、推理强度、权限、审批、并发上限和项目的 `.codex/` 沿用现有设置。宿主无法委派时，Muse 会说明哪些工作由同一会话分次完成。首次试读的材料边界由简报和独立上下文控制；受托子代理继承当前工作区的文件权限。
+四个入口都需要显式选用。安装登记插件源和插件启用状态。全局模型、权限、审批、并发上限和项目的 `.codex/` 沿用现有设置；单个任务的模型和推理强度按角色定义与宿主实际能力选择。宿主无法委派时，Muse 会说明哪些工作由同一会话分次完成。首次试读的材料边界由简报和独立上下文控制；受托子代理继承当前工作区的文件权限。
+
+**指定模型时可以这样要求：**“按上游 critic 的 Opus / high 审稿。如果这个环境无法运行，请告诉我；等我决定是否接受替代。”原生 Codex 使用当前宿主提供的模型。已经配置上游 Claude Code 或 Meridian 的项目，可以在对应运行时调用其具名角色，由该运行时执行模型路由和工具限制。严格复现跨模型家族的复核需要实际运行两个提供商。
+
+| 角色 | Meridian 源定义 | 上游 Claude Code 构建 |
+| --- | --- | --- |
+| writer | opus，匹配 opus 时 high | opus / high |
+| critic | opus / high | opus / high |
+| continuity-checker | sonnet / high | sonnet / high |
+| creative-researcher | luna / medium | sonnet / medium |
+| kb-lead | opus / medium | opus / medium |
+
+完整原文位于[角色源定义](plugins/creative-writing-skills/reference/agents)和[Claude 构建定义](plugins/creative-writing-skills/reference/claude-agents)。角色支持的工具、可用技能、模型策略及匹配时的覆盖值以对应文件为准。
 
 上游分工、Codex 映射、一次真实的子代理运行和可复用的两章样本见[工作流验证记录](docs/codex-workflow/README.md)。
 
@@ -56,4 +68,4 @@ git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-co
 
 从 ZIP 或本地检出安装时，在包含本说明和 `.agents/` 的目录运行 `codex plugin marketplace add .`，再运行 `codex plugin add creative-writing-skills@creative-writing-skills`。
 
-本版基于 Jimmy Yao 的 Creative Writing Skills 0.9.5（Apache-2.0）。随包的三篇英文参考资料保留原文。同步上游时，可把 `skills/creative-writing-craft/resources/` 里的 `prose-writing.md` 和 `style-analysis.md` 更新到 Muse 的 `references/`，把 `skills/story-review/resources/editorial-review.md` 更新到审稿技能的 `references/`。许可证在包内的 `LICENSE`。
+本版基于 Jimmy Yao 的 Creative Writing Skills 0.9.5（Apache-2.0）。仓库维护者更新上游基线后，运行 `python3 scripts/sync_codex_references.py`，再运行同一命令加 `--check` 验证安装包中的参考文件。脚本从源码、已提交的 Mars 构建产物和其锁定的 meridian-base 版本生成；已有该依赖的 Git 检出时，可以通过 `--meridian-base PATH` 离线构建。使用插件时所有资料均在安装包内。独立的 writing-sync 工具继续由原依赖提供。

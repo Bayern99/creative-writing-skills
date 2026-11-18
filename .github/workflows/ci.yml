@@ -45,6 +45,9 @@ jobs:
             exit 1
           fi
 
+      - name: Check Codex references match the upstream roles and skills
+        run: python3 scripts/sync_codex_references.py --check
+
       - name: Check every agent and skill reference resolves
         run: python3 scripts/check_refs.py
 
