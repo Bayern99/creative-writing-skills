@@ -23,12 +23,20 @@ codex plugin list --marketplace bayern-writing
 
 在聊天中直接试稿可以跳过项目初始化。设置项目时，插件先展示拟建的目录和约定，经作者确认后落盘。
 
+## Muse 怎么用子代理
+
+在小说项目里显式选 `$creative-writing-muse`。可以直接说：“第一章是定稿。请给第二章做一次独立的跨章连续性核查，也单独看看线索递给读者时会不会太早。我只要审稿，附一句你实际怎么分工的。” Muse 在当前会话执笔和裁决，按任务给通用子代理交代角色、可见材料和交付物。写短段或说“这次你自己看”时，留在当前会话就能完成。
+
+四个入口都需要显式选用。安装只登记本地市场和插件启用状态。模型、推理强度、权限、审批、并发上限和项目的 `.codex/` 沿用现有设置。宿主无法委派时，Muse 会说明哪些工作由同一会话分次完成。首次试读的材料边界由简报和独立上下文控制；受托子代理继承当前工作区的文件权限。
+
+上游分工、Codex 映射、一次真实的子代理运行和可复用的两章样本见[工作流验证记录](docs/codex-workflow/README.md)。
+
 ## 打包和维护
 
 独立包位于 `plugins/creative-writing-skills/`，源目录可以直接编辑。本地目录清单是 `.agents/plugins/marketplace.json`。发新版时更新插件自己的 `plugin.json` 版本号，提交后在仓库根目录打包：
 
 ```sh
-git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-codex.zip HEAD .agents/plugins/marketplace.json plugins/creative-writing-skills CODEX.zh-CN.md
+git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-codex.zip HEAD .agents/plugins/marketplace.json plugins/creative-writing-skills CODEX.zh-CN.md docs/codex-workflow
 ```
 
 更新自用安装时，把新版解压到原来的插件源位置，再运行安装命令并新建会话。

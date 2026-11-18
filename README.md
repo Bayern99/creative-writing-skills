@@ -13,7 +13,7 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ## Quick Start
 
-1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork) [Claude.ai](#claudeai), or [Codex](#codex).
+1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork), [Claude.ai](#claudeai), or [Codex](#codex).
 2. **Run project setup once, before you write anything.** Agents never start it for you; you do:
 
    | Environment | Run |
