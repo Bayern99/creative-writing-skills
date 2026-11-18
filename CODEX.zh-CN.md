@@ -33,17 +33,16 @@ codex plugin marketplace remove bayern-writing
 
 在小说项目里显式选 `$creative-writing-muse`。可以直接说：“第一章是定稿。请给第二章做一次独立的跨章连续性核查，也单独看看线索递给读者时会不会太早。我只要审稿，附一句你实际怎么分工的。” Muse 在当前会话执笔和裁决，按任务给通用子代理交代角色、可见材料和交付物。写短段或说“这次你自己看”时，留在当前会话就能完成。
 
-选用技能后就可以开工。主会话继续用你选的 Codex 模型，子代理用项目配置的模型，通常继承主会话。遇到整章审稿、长篇改写或跨章核查，宿主支持时给该次任务分配更高推理强度。日常写作和审稿无需另外安装运行时或配置模型。
+子代理按上游角色的默认模型选择 Codex 对应项。Muse 在主会话里使用已选模型，推荐 Astra。Spark 和 Setup 的推荐模型是 Sol。
 
-| 上游分工 | Codex 里的做法 |
-| --- | --- |
-| Muse / Spark | 用当前会话构思、试写和修改。Spark 单会话完成 |
-| writer | 另写一版、指定润色或长稿时委派；一个场景只交给一位执笔人 |
-| critic / continuity-checker | 每个子代理只回答一个审稿问题，核对正文或跨章设定。写入由 Muse 处理 |
-| reader-sim | 用只看到读者可见章节的新子会话试读。如果宿主无法隔离，交代试读的局限 |
-| creative-researcher / kb-lead | 前者用当前可用的来源查证，后者根据定稿和作者裁定更新设定集 |
+| 上游默认模型 | Codex 对应模型 | 角色举例 |
+| --- | --- | --- |
+| Opus | GPT-6.2 Astra | Muse、执笔、专项审稿、首次试读、设定维护负责人 |
+| Sonnet | GPT-6.2 Sol | 大纲、跨章连续性、Spark、Setup |
+| Terra | GPT-6.1 Terra | 旁读、设定集结构维护、翻查旧会话 |
+| Luna | GPT-6 Luna | 资料查证、文件搜寻 |
 
-按需选用宿主可用的模型。如果你说“这个审稿只接受 Opus / high”，插件会在该角色启动前核实这个条件。显式选择 Claude Code 或 Meridian 时，可以使用那个环境的具名角色。上游模型、技能和工具定义见[角色源定义](plugins/creative-writing-skills/reference/agents)和[Claude 构建定义](plugins/creative-writing-skills/reference/claude-agents)。
+启动子代理时传入具体模型 ID 和角色要求的推理强度。例如 `critic` 和 `writer` 使用 Astra / high，`continuity-checker` 使用 Sol / high，`creative-researcher` 使用 Luna / medium。可用模型由 Codex 客户端和账户决定。如果当前环境缺少对应模型，普通任务用宿主默认模型完成。明确指定必须使用某个模型时，该任务以你的要求为准。[完整角色映射与启动规则](plugins/creative-writing-skills/skills/creative-writing-muse/references/codex-models.md)
 
 上游分工、Codex 映射、一次真实的子代理运行和可复用的两章样本见[工作流验证记录](docs/codex-workflow/README.md)。
 

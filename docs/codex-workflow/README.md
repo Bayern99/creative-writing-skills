@@ -53,3 +53,7 @@
 在新开的 Codex 会话里显式读取安装后的 Muse。请求只要求跨章连续性核查和独立试读。Muse 用宿主默认模型启动两个原生子代理，分别按 continuity-checker 和 reader-sim 交班。两者均以新上下文运行，没有指定其他模型或安装额外运行时。
 
 核查指出第一章唯一的钥匙已封进玻璃匣，第二章却又挂在阿芸颈上。试读者一看到水渍的大小用船票来比，就猜到桌上曾有一张湿票。Muse 将钥匙矛盾和线索早泄分开汇报，也保留了船是否真的开过这一悬念。审稿在聊天里交付，样稿的 Git diff 为空。
+
+## Codex 角色模型映射复测
+
+将 17 个角色的映射和推理强度逐项对照上游定义。在 Codex 会话中使用安装后的 Muse 审读样稿，四次原生子代理启动分别传入 Astra / high（critic）、Sol / high（continuity-checker）、Terra / medium（cold-reader）和 Luna / medium（explorer）。四次启动均接受对应参数。启动回执提供子代理任务名。[完整模型映射](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/codex-models.md)
