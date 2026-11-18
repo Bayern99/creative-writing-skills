@@ -37,7 +37,7 @@ codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
 codex plugin add creative-writing-skills@creative-writing-skills
 ```
 
-Open your fiction project in a new Codex session and select `$creative-writing-muse` to start. The [Chinese guide](CODEX.zh-CN.md) covers project setup, review, story memory, and updates.
+Open your fiction project in a new Codex session and select `$creative-writing-muse`. Muse uses your current session model and hands independent work to Codex subagents when available. The Chinese guide covers project setup, review, story memory, and updates. [Codex guide](CODEX.zh-CN.md)
 
 ### Mars (meridian-cli)
 

@@ -47,3 +47,9 @@
 - 对照上游 0.9.5 的 12 个创作角色、Mars 锁定的 5 个 meridian-base 角色和 17 份 Claude 构建定义，逐文件核验，并检查这些角色声明的核心及可选技能都能在安装目录中找到。四个 Codex 入口按需读取 24 份技能及其材料。
 - 在临时项目中使用 Meridian 0.23.4 载入原始 critic 和 creative-researcher profile，分别运行 spawn 的 dry-run。解析记录的首选分别是 opus 和 luna；critic 的 opus 在 Claude 路径返回 not_installed，在 Codex 路径返回 provider_constraint_unsatisfied。两次均返回 model_candidates_exhausted，实际模型调用次数为零。
 - 在新的 Codex 子会话中直接读取已安装的 Muse，给出“只接受 critic 的 Opus / high，只允许原生工具”的请求。该会话核对 critic 配置，指出宿主支持 high、没有 Opus，并将审稿留待有相应模型的环境执行。这是对严格模型条件的行为验证。Opus、Sonnet 的真实生成和两家提供商的交叉复核仍需在有相应运行时的项目中实测。
+
+## Codex 默认模型下的审稿复测
+
+在新开的 Codex 会话里显式读取安装后的 Muse。请求只要求跨章连续性核查和独立试读。Muse 用宿主默认模型启动两个原生子代理，分别按 continuity-checker 和 reader-sim 交班。两者均以新上下文运行，没有指定其他模型或安装额外运行时。
+
+核查指出第一章唯一的钥匙已封进玻璃匣，第二章却又挂在阿芸颈上。试读者一看到水渍的大小用船票来比，就猜到桌上曾有一张湿票。Muse 将钥匙矛盾和线索早泄分开汇报，也保留了船是否真的开过这一悬念。审稿在聊天里交付，样稿的 Git diff 为空。
