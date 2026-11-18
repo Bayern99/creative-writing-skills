@@ -1,19 +1,21 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "creative-writing-skills",
-  "version": "0.2.0",
+  "version": "0.9.5",
   "description": "A fiction writing partner for Codex. Plan scenes, draft in the author's voice, review chapters and keep a source-backed story bible.",
-  "repository": "https://github.com/Bayern99/creative-writing-skills",
+  "repository": "https://github.com/haowjy/creative-writing-skills",
   "license": "Apache-2.0",
   "extensions": {
     "com.openai": {
       "onboardingSkill": "./skills/project-setup/SKILL.md",
       "interface": {
-        "displayName": "Creative Writing Skills · 小说写作",
+        "displayName": "Creative Writing Skills",
         "shortDescription": "一起构思和起草小说，审读章节，记住已经定稿的设定。",
-        "developerName": "Bayern99",
         "category": "Productivity",
-        "capabilities": ["Read", "Write"],
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
         "defaultPrompt": [
           "沿着上一章的视角，给我两个下一场的走向，先别定稿。",
           "以第一次读到这里的读者身份读这一章，告诉我在哪里开始怀疑叙述者。",
@@ -21,5 +23,10 @@
         ]
       }
     }
-  }
+  },
+  "author": {
+    "name": "Jimmy Yao",
+    "email": "dev.jimm.py@gmail.com"
+  },
+  "homepage": "https://github.com/haowjy/creative-writing-skills"
 }

@@ -30,11 +30,11 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ### Codex
 
-Install this fork’s writing plugin directly from GitHub with the Codex CLI:
+Install Creative Writing Skills from the Codex integration branch:
 
 ```sh
 codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
-codex plugin add creative-writing-skills@bayern-writing
+codex plugin add creative-writing-skills@creative-writing-skills
 ```
 
 Open your fiction project in a new Codex session and select `$creative-writing-muse` to start. The [Chinese guide](CODEX.zh-CN.md) covers project setup, review, story memory, and updates.

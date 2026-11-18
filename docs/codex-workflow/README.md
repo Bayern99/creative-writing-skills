@@ -2,7 +2,7 @@
 
 ## 原设计里谁作决定
 
-检查基线为 fork 的 main，提交 f821366（0.9.5）。Mars 把代理与技能编译给不同宿主，Claude Code 版有具名代理。作者面对的 Muse 只在代理定义里声明职责、可用技能和可委派对象；实际流程写在技能里。因此移植时要沿着代理、技能和交接材料三层一起读。[Muse 定义](https://github.com/Bayern99/creative-writing-skills/blob/f821366/agents/muse.md) · [生命周期](https://github.com/Bayern99/creative-writing-skills/blob/f821366/skills/story-workflow/SKILL.md)
+检查基线为 上游 main，提交 f821366（0.9.5）。Mars 把代理与技能编译给不同宿主，Claude Code 版有具名代理。作者面对的 Muse 只在代理定义里声明职责、可用技能和可委派对象；实际流程写在技能里。因此移植时要沿着代理、技能和交接材料三层一起读。[Muse 定义](https://github.com/haowjy/creative-writing-skills/blob/f821366/agents/muse.md) · [生命周期](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/story-workflow/SKILL.md)
 
 | main 中的职责 | Codex 版如何执行 |
 | --- | --- |
@@ -12,11 +12,11 @@
 | Critic 每人负责一种编辑层级或一个问题。连续性核查跨章节。Reader-sim 受读者可知信息限制 | 可并行核查同一稿件，再依次修订和试读。同一批报告算一轮，评读加修订满两轮就交还作者 |
 | KB lead 在作品或决定已定时接手。试写与作者裁定分开 | 明确指出被接受的版本和授权的目标页。沿用已有条目；单独的审稿请求在审稿报告结束 |
 
-原项目的生产者和审稿人简报规定了发什么、收什么；写作上下文指南还区分哪些角色需要前情、哪些角色只应看选出的资料。本版把这些规则放进 Muse 随包的分工说明。Meridian 的模型策略、跨提供商调度、知识库整树重组和外部同步超出本次改编与测试范围。[生产者](https://github.com/Bayern99/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/producers.md) · [审稿人](https://github.com/Bayern99/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/reviewers.md) · [交接材料](https://github.com/Bayern99/creative-writing-skills/blob/f821366/skills/story-memory/resources/story-context.md) · [Codex 分工说明](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/writing-staffing.md)
+原项目的生产者和审稿人简报规定了发什么、收什么；写作上下文指南还区分哪些角色需要前情、哪些角色只应看选出的资料。本版把这些规则放进 Muse 随包的分工说明。Meridian 的模型策略、跨提供商调度、知识库整树重组和外部同步超出本次改编与测试范围。[生产者](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/producers.md) · [审稿人](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/writing-staffing/resources/reviewers.md) · [交接材料](https://github.com/haowjy/creative-writing-skills/blob/f821366/skills/story-memory/resources/story-context.md) · [Codex 分工说明](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/writing-staffing.md)
 
 ## 两种运行分别验证了什么
 
-**本地 CLI 安装与发现。** 在空白配置目录用 Codex CLI 0.167.0-alpha.4 安装，app-server 的 skills/list 从插件缓存返回全部四个技能。检查 config.toml，新增内容只有 bayern-writing 市场位置及插件启用项。四个技能均配置为显式选用。Codex 文档说明本地可按用户或技能指令调用子代理；子代理继承当前权限和审批，模型与推理强度由现有设置决定。[Codex 子代理文档](https://developers.openai.com/codex/subagents/)
+**本地 CLI 安装与发现。** 在空白配置目录用 Codex CLI 0.167.0-alpha.4 安装，app-server 的 skills/list 从插件缓存返回全部四个技能。检查 config.toml，新增内容只有市场位置及插件启用项。四个技能均配置为显式选用。Codex 文档说明本地可按用户或技能指令调用子代理；子代理继承当前权限和审批，模型与推理强度由现有设置决定。[Codex 子代理文档](https://developers.openai.com/codex/subagents/)
 
 **行为验证。** 当前 Codex 宿主的主会话与真实子代理显式读取 CLI 安装缓存里的技能。以下是实际运行记录。在另一次尝试中，独立的 codex exec 在调用模型时收到 HTTP 401，因此本次没有验证桌面选择器到模型回答的完整链路，也没有运行 Claude Code 对照组。
 

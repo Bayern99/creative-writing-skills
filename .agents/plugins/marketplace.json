@@ -1,6 +1,6 @@
 {
-  "name": "bayern-writing",
-  "interface": { "displayName": "Bayern · 写作工具" },
+  "name": "creative-writing-skills",
+  "interface": { "displayName": "Creative Writing Skills" },
   "plugins": [
     {
       "name": "creative-writing-skills",
