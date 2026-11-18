@@ -13,19 +13,24 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ## Quick Start
 
-1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork) or [Claude.ai](#claudeai).
+1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork) [Claude.ai](#claudeai), or [Codex](#codex).
 2. **Run project setup once, before you write anything.** Agents never start it for you; you do:
 
    | Environment | Run |
    |---|---|
+   | Codex | select the plugin’s `project-setup` skill when you want a filesystem-backed writing project |
    | meridian-cli | `meridian bootstrap` (runs automatically in your first session) |
    | Claude Code / Cowork | `/creative-writing-skills:project-setup` |
    | Claude.ai | turn on `project-setup` and ask it to set up your project |
 
    It interviews you about the project, collects writing samples, and creates your `AGENTS.md`, the `kb/` layout and your first style files. Every agent reads those, so skipping this step makes them guess your conventions.
-3. **Start writing with muse**, your creative partner: `meridian` (meridian-cli), `claude --agent creative-writing-skills:muse` (Claude Code), or turn on `creative-writing-muse` (Claude.ai).
+3. **Start writing with muse**, your creative partner: `meridian` (meridian-cli), `claude --agent creative-writing-skills:muse` (Claude Code), or select `creative-writing-muse` (Claude.ai or Codex).
 
 ## Installation
+
+### Codex
+
+This fork includes a local Codex marketplace with four fiction workflows for drafting, project setup, review, and story memory. From this branch or the extracted personal package, follow the [Codex installation guide and Chinese examples](CODEX.zh-CN.md).
 
 ### Mars (meridian-cli)
 
