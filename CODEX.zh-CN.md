@@ -7,7 +7,7 @@
 在任意目录用支持 `codex plugin` 的 Codex CLI 运行以下命令。第一条注册提供 Codex 适配的分支，第二条安装插件。
 
 ```sh
-codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
+codex plugin marketplace add Bayern99/creative-writing-skills --ref plugins
 codex plugin add creative-writing-skills@creative-writing-skills
 ```
 
@@ -26,6 +26,7 @@ codex plugin marketplace remove bayern-writing
 | `project-setup` | “帮我设置这部长篇。正稿放在‘正文’，试稿放在‘试写’。先给我看准备补充的项目约定。” |
 | `story-review` | “当第一次读到第三章的读者。指出你从哪句话开始怀疑哥哥在撒谎，先别改稿。” |
 | `story-memory` | “第三章已经定稿。把钥匙最后由谁保管更新到人物页，附上场景出处。备选结局仍放在工作笔记里。” |
+| `atlas` | “根据已有设定，做一份能点进去看的阵营和人物关系图。” |
 
 在聊天中直接试稿可以跳过项目初始化。设置项目时，插件先展示拟建的目录和约定，经作者确认后落盘。
 
@@ -53,11 +54,11 @@ codex plugin marketplace upgrade creative-writing-skills
 codex plugin add creative-writing-skills@creative-writing-skills
 ```
 
-新开会话后即可使用。运行 `codex plugin list --marketplace creative-writing-skills` 可查看安装状态。
+已用旧 `codex-plugin` 分支安装的用户也可运行相同的更新命令。新开会话后即可使用。运行 `codex plugin list --marketplace creative-writing-skills` 可查看安装状态。
 
 ## 本地安装与打包
 
-独立包位于 `plugins/creative-writing-skills/`，源目录可以直接编辑。本地目录清单是 `.agents/plugins/marketplace.json`。插件名、作者、项目主页、许可证和版本与上游项目元数据对齐。更新上游基线时同步 `plugin.json`，提交后在仓库根目录打包：
+独立包位于 `plugins/creative-writing-skills/`，源目录可以直接编辑。本地目录清单是 `.agents/plugins/marketplace.json`。插件名、作者、项目主页、许可证和版本与上游项目元数据对齐。同步脚本也会更新 `plugin.json` 的版本号。提交后在仓库根目录打包：
 
 ```sh
 git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-codex.zip HEAD .agents/plugins/marketplace.json plugins/creative-writing-skills CODEX.zh-CN.md docs/codex-workflow
@@ -65,4 +66,4 @@ git archive --format=zip --prefix=creative-writing-codex/ -o creative-writing-co
 
 从 ZIP 或本地检出安装时，在包含本说明和 `.agents/` 的目录运行 `codex plugin marketplace add .`，再运行 `codex plugin add creative-writing-skills@creative-writing-skills`。
 
-本版基于 Jimmy Yao 的 Creative Writing Skills 0.9.5（Apache-2.0）。仓库维护者更新上游基线后，运行 `python3 scripts/sync_codex_references.py`，再运行同一命令加 `--check` 验证安装包中的参考文件。脚本从源码、已提交的 Mars 构建产物和其锁定的 meridian-base 版本生成；已有该依赖的 Git 检出时，可以通过 `--meridian-base PATH` 离线构建。使用插件时所有资料均在安装包内。独立的 writing-sync 工具继续由原依赖提供。
+本版基于 Jimmy Yao 的 Creative Writing Skills 0.9.8（Apache-2.0）。仓库维护者更新上游基线后，运行 `python3 scripts/sync_codex_references.py`，再运行同一命令加 `--check` 验证安装包中的参考文件。脚本从源码、已提交的 Mars 构建产物和其锁定的 meridian-base 版本生成；已有该依赖的 Git 检出时，可以通过 `--meridian-base PATH` 离线构建。使用插件时所有资料均在安装包内。独立的 writing-sync 工具继续由原依赖提供。

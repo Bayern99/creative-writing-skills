@@ -2,6 +2,32 @@
 
 ## [Unreleased]
 
+### Antigravity fork
+
+- Sync the native plugin to upstream 0.9.8 and meridian-base 0.18.1. Add Atlas with its bundled viewer and the primary-only `spark` and `setup` agents.
+- Rebuild with the Mars version recorded in the upstream manifest.
+
+## [0.9.8] - 2026-11-19
+
+### Changed
+- Agents are named in backticks without `@` (`explorer`, not `@explorer`): in Claude Code a bare `@path` in a skill or AGENTS.md loads that file. `scripts/check_refs.py` now checks skill references only; agent names are checked by hand against the include list. Bundles meridian-base 0.18.1.
+
+## [0.9.7] - 2026-11-19
+
+### Added
+- muse can load meridian-base's `/atlas`, for maps of a story's cast, factions and plot you click down through.
+
+### Changed
+- Requires and bundles meridian-base 0.18.0.
+
+## [0.9.6] - 2026-11-18
+
+### Removed
+- Plugin no longer ships meridian-base's `/information-hierarchy`, which meridian-base removed.
+
+### Changed
+- Requires and bundles meridian-base 0.17.0.
+
 ## [0.9.5] - 2026-11-16
 
 ### Changed
@@ -64,6 +90,12 @@
 
 ### Changed
 - Requires meridian-base 0.15 (`/correct` fixes causes instead of logging corrections; the corrections register is gone).
+
+### Antigravity fork
+- Sync the native plugin with upstream 0.7.7 and meridian-base 0.15.1: topic-based choice capture, `/grill`, source-passage session mining, and updated knowledge maintenance.
+- Let Writer, Critic, Outliner, Style Creator, and KB Lead inherit the selected main model; keep the other nine specialists on the Flash tier. For example, choosing Gemini 4 Hydrogen gives Hydrogen + Flash operation.
+- Document the App's Software Engineering layout and Overview > Subagents controls for following native child conversations.
+- Match upstream's Mars 0.27.4 builder and regenerate Antigravity after Mars in CI and pre-commit checks, before comparing the complete plugin tree.
 
 ## [0.7.6] - 2026-11-11
 

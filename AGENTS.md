@@ -6,6 +6,8 @@ source ships to meridian-cli and Claude Code projects through `mars add`, as a p
 Claude Code, Codex, Cursor and OpenCode, and as Claude.ai skill zips on each GitHub
 Release. Codex, OpenCode and Claude.ai users get the skills but no agents.
 
+The fork's `plugins` branch ships Codex and Antigravity integrations from the same upstream base. The fork's `main` follows upstream `main` exactly.
+
 ## Rules
 
 - **Write muse's method into the skills.** `creative-writing-muse` and `story-workflow`
@@ -37,7 +39,7 @@ Release. Codex, OpenCode and Claude.ai users get the skills but no agents.
 ```bash
 meridian mars build plugin                         # rebuild plugin/ and the catalogs
 meridian mars check                                # package, frontmatter, stale plugin output
-python3 scripts/check_refs.py                      # every @agent and /skill in plugin/claude resolves
+python3 scripts/check_refs.py                      # every skill reference in plugin/claude resolves
 claude plugins validate plugin/claude              # plugin manifest and components
 claude plugins validate .claude-plugin/marketplace.json
 python3 scripts/create_skill_zips.py               # Claude.ai zips/*.skill (CI does this on release)
@@ -45,8 +47,10 @@ meridian -C "$PWD" mars version patch --push --no-tag   # release: bump, rebuild
 git config core.hooksPath .githooks                # once per clone: run these checks at commit
 ```
 
-Rebuild, then run `check_refs.py`, after any edit that names an agent or a skill: it
-fails when the dependency filters drop something a shipped file names. The pre-commit
+Rebuild, then run `check_refs.py`, after any edit that names a skill: it fails when
+the dependency filters drop a skill a shipped file names. It can't see agent names, which
+are plain backticked words, so when a shipped file names a new agent, add it to the
+`agents` include list in `mars.toml` yourself. The pre-commit
 hook skips its Mars checks when bare `mars` isn't on PATH.
 
 ## Releasing
@@ -64,21 +68,78 @@ A failed run means no release and no tag: fix the cause, push, and the next push
 retries. Releasing the same version again deletes nothing, because no tag exists.
 `../AGENTS.md` still tags locally for the other packages, which have no CI.
 
+## Updating the integrations
+
+Bring the upstream changes into the `plugins` branch, then refresh both plugin
+targets from the same resolved Mars output. Use the Mars version recorded in
+`plugin/.mars-plugin.json`.
+
+```bash
+mars build plugin
+python3 scripts/build_antigravity.py
+python3 scripts/sync_codex_references.py
+```
+
+Keep the Codex manifest version aligned with `mars.toml`. Run
+`scripts/sync_codex_references.py --check` and `scripts/check_antigravity.py`
+after updating the generated files. The `codex-plugin` and
+`antigravity-plugin` branch names serve existing installations by pointing to
+the same commit as `plugins`.
+
+## Antigravity target
+
+`plugin/antigravity/` is generated output. Edit `antigravity/agents.toml`,
+`antigravity/patches.toml`, or `antigravity/overlay/`, then rebuild from the
+resolved `plugin/claude/` tree. Never hand-edit the generated target. Review
+upstream changes before updating SHA-256 patch gates; a changed hash is a prompt
+to inspect the source, not to accept it blindly.
+
+Use the Mars version recorded in `plugin/.mars-plugin.json`. Mars replaces the
+whole `plugin/` output directory, so run it first and the Antigravity builder
+second. CI and the pre-commit hook check the resulting tree.
+
+The model policy is `inherit` for Muse, Writer, Critic, Outliner, Style Creator,
+and KB Lead, and `flash` for the other nine specialists. The author freely
+selects the main-session model. For example, selecting Gemini 4 Hydrogen
+gives Hydrogen + Flash operation; selecting Argon makes the inherited
+specialists use Argon too. Use native
+`invoke_subagent` conversations with the documented tiers. Spark and Setup
+are primary-only agents and use the session model.
+
+The Antigravity adaptation keeps Writer available for fresh drafts and revisions
+as well as alternate takes, polish, and long drafts; keep its guides aligned with
+the dispatch patches when syncing upstream.
+
+```bash
+python3 scripts/build_antigravity.py
+python3 scripts/check_antigravity.py
+python3 tests/e2e_antigravity_test.py
+python3 tests/test_m1_adversarial.py
+python3 tests/test_delegation_flow.py
+agy plugin validate --strict plugin/antigravity
+```
+
+The build preserves the read-only reviewer tool lists and caller reporting,
+rewrites skill references, and includes the existing git guard hook. Commit the
+configuration and regenerated target together. The live App's child model and
+subagent UI are checked in Antigravity; the repository tests check packaging,
+routing declarations, and dispatch instructions.
+
 ## Watching
 
 - **Muse runs the lifecycle from `/story-workflow`.** On the next muse
   sessions, and the next claude.ai or Codex sessions with
   `creative-writing-muse` on: it states its read in a line instead of a
-  question list; it drafts in its own context and spawns `@writer` only for
+  question list; it drafts in its own context and spawns `writer` only for
   an alternate take, an author-asked polish pass, or a very long draft; every
   plan marks confirmed versus provisional parts; after two critique rounds on
   a chapter it presents the open concerns and lets the author decide.
-- **`@kb-lead` briefs name what settled.** When a chapter or ruling
-  settles, muse spawns `@kb-lead` with what settled and the files that show
+- **`kb-lead` briefs name what settled.** When a chapter or ruling
+  settles, muse spawns `kb-lead` with what settled and the files that show
   it, and a trial direction lands in the kb as a trial, not canon (#10). If
   trials still harden, story-memory needs the three kinds of story knowledge
   #10.1 proposes.
-- **`@critic` covers editorial review.** Asked for an editorial review, a
+- **`critic` covers editorial review.** Asked for an editorial review, a
   critic reads the whole draft before writing,
   leads with the overall diagnosis, orders notes by reader cost, and writes
   no replacement prose. Callers name a focus area or an edit level; a critic

@@ -13,3 +13,6 @@ mars.lock
 /.cursor/skills/
 /.opencode/agents/
 /.opencode/skills/
+
+__pycache__/
+*.pyc

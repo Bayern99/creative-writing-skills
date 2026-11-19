@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build or verify the installed Codex reading copy from the checked-in Mars inputs/output."""
+"""Sync the Codex manifest version and reading copy to the checked-in Mars output."""
 import argparse
 import json
 import subprocess
@@ -7,7 +7,8 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "plugins/creative-writing-skills/reference"
+PACKAGE = ROOT / "plugins/creative-writing-skills"
+REFERENCE = PACKAGE / "reference"
 CLAUDE = ROOT / "plugin/claude"
 
 
@@ -40,7 +41,8 @@ def main():
     parser.add_argument("--check", action="store_true", help="report stale output without writing")
     parser.add_argument("--meridian-base", type=Path, help="existing Git checkout with the pinned revision")
     args = parser.parse_args()
-    lock = json.loads((ROOT / "plugin/.mars-plugin.json").read_text())["dependencies"]["meridian-base"]
+    mars_manifest = json.loads((ROOT / "plugin/.mars-plugin.json").read_text())
+    lock = mars_manifest["dependencies"]["meridian-base"]
     with TemporaryDirectory() as temp:
         base_repo = args.meridian_base
         if base_repo is None:
@@ -55,6 +57,15 @@ def main():
         parser.error("missing committed Mars plugin output")
     existing = {p.relative_to(REFERENCE) for p in REFERENCE.rglob("*") if p.is_file()}
     stale = []
+    manifest_path = PACKAGE / "plugin.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest["version"] != mars_manifest["version"]:
+        stale.append(manifest_path.relative_to(ROOT))
+        if not args.check:
+            manifest["version"] = mars_manifest["version"]
+            manifest_path.write_text(
+                json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
     for rel, data in expected.items():
         target = REFERENCE / rel
         if not target.is_file() or target.read_bytes() != data:
@@ -67,7 +78,7 @@ def main():
         if not args.check:
             (REFERENCE / rel).unlink()
     if args.check and stale:
-        parser.exit(1, "Stale Codex references:\n" + "\n".join(map(str, stale)) + "\n")
+        parser.exit(1, "Stale Codex plugin files:\n" + "\n".join(map(str, stale)) + "\n")
     print(f"Codex references: {len(expected)} source files verified" if args.check else
           f"Codex references: {len(stale)} files synchronized")
 

@@ -13,31 +13,64 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
 ## Quick Start
 
-1. **Install** for your environment: [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork), [Claude.ai](#claudeai), or [Codex](#codex).
+1. **Install** for your environment. [Codex](#codex), [Google Antigravity 2.0](#google-antigravity-20), [meridian-cli](#mars-meridian-cli), [Claude Code / Cowork](#claude-code--cowork), or [Claude.ai](#claudeai).
 2. **Run project setup once, before you write anything.** Agents never start it for you; you do:
 
    | Environment | Run |
    |---|---|
    | Codex | select the plugin’s `project-setup` skill when you want a filesystem-backed writing project |
+   | Google Antigravity 2.0 | `/project-setup` or the `setup` agent |
    | meridian-cli | `meridian bootstrap` (runs automatically in your first session) |
    | Claude Code / Cowork | `/creative-writing-skills:project-setup` |
    | Claude.ai | turn on `project-setup` and ask it to set up your project |
 
    It interviews you about the project, collects writing samples, and creates your `AGENTS.md`, the `kb/` layout and your first style files. Every agent reads those, so skipping this step makes them guess your conventions.
-3. **Start writing with muse**, your creative partner: `meridian` (meridian-cli), `claude --agent creative-writing-skills:muse` (Claude Code), or select `creative-writing-muse` (Claude.ai or Codex).
+3. **Start writing with Muse**. Select `creative-writing-muse` in Codex or Claude.ai, select `muse` in Antigravity, run `meridian` in Meridian, or start Claude Code with `claude --agent creative-writing-skills:muse`.
 
 ## Installation
 
 ### Codex
 
-Install Creative Writing Skills from the Codex integration branch:
+Install Creative Writing Skills from the shared `plugins` branch:
 
 ```sh
-codex plugin marketplace add Bayern99/creative-writing-skills --ref codex-plugin
+codex plugin marketplace add Bayern99/creative-writing-skills --ref plugins
 codex plugin add creative-writing-skills@creative-writing-skills
 ```
 
 Open your fiction project in a new Codex session and select `$creative-writing-muse`. Muse uses your current session model and hands independent work to Codex subagents with models mapped from the upstream roles. The Chinese guide covers project setup, review, story memory, and updates. [Codex guide](CODEX.zh-CN.md)
+
+### Google Antigravity 2.0
+
+Install creative-writing-skills as a native Google Antigravity 2.0 plugin in the Desktop App or CLI.
+
+**Antigravity Desktop App**:
+1. Place the complete `plugin/antigravity/` directory at `~/.gemini/config/plugins/creative-writing-skills/`, or at `.agents/plugins/creative-writing-skills/` within one project. Replace the installed directory as a whole when updating manually.
+2. Open **Customizations → Installed** in Antigravity's left sidebar.
+3. Inspect and enable the Creative Writing plugin. See the [official plugin guide](https://antigravity.google/docs/plugins).
+4. Open the Agent selector in any conversation and choose **muse** as your main agent.
+
+**Antigravity CLI (`agy`)**:
+Install from local path:
+```bash
+agy plugin install ./plugin/antigravity
+```
+
+Or install directly via GitHub subpath URL:
+```bash
+agy plugin install https://github.com/Bayern99/creative-writing-skills/tree/plugins/plugin/antigravity
+```
+
+Once installed, verify discovery with:
+```bash
+agy plugin list --json
+agy agents
+```
+
+**First session workflow**:
+1. In your project directory, run `/project-setup` in Antigravity to create your `AGENTS.md`, `kb/` layout, and voice styles.
+2. Start writing with `muse`. Muse acts as your orchestrator and primary creative partner, using `invoke_subagent` to spawn specialized subagents (`critic`, `reader-sim`, `continuity-checker`, `writer`, `kb-lead`) in independent parallel contexts.
+3. **Model Strategy**: Choose the main model in the Desktop App or CLI. `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit`; the other nine specialists use `model: flash`. For example, choosing Gemini 4 Hydrogen gives Hydrogen + Flash operation. Switching the main model also switches inherited specialists. See the [Antigravity guide](plugin/antigravity/README.md) for routing and subagent visibility settings.
 
 ### Mars (meridian-cli)
 
@@ -48,7 +81,7 @@ meridian mars sync
 
 Then run `meridian` to start a meridian-cli session with muse. First-time setup runs the bootstrap automatically.
 
-`@writer` defaults to Opus at high effort.
+`writer` defaults to Opus at high effort.
 
 ### Claude Code / Cowork
 
@@ -173,7 +206,7 @@ Knowledge extraction into the kb in harnesses without agents stays in the conver
 | **shared-dao** | Shared vocabulary: canonical story terms, aliases, and ambiguity resolution |
 | **project-setup** | One-time guided setup (user-invoked): interviews you, then creates AGENTS.md, the kb layout, and style files |
 
-The plugin also ships the shared `meridian-base` skills its agents load: `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `intent-modeling`, `md-validation`, `shared-workspace`, and `structured-artifact`, for the knowledge and craft discipline.
+The plugin also ships the shared `meridian-base` skills its agents load: `knowledge-layers`, `qi-layer`, `qi-maintenance`, `intent-modeling`, `md-validation`, `shared-workspace`, and `structured-artifact`, for the knowledge and craft discipline.
 
 ## Project Layout
 

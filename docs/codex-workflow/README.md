@@ -57,3 +57,7 @@
 ## Codex 角色模型映射复测
 
 将 17 个角色的映射和推理强度逐项对照上游定义。在 Codex 会话中使用安装后的 Muse 审读样稿，四次原生子代理启动分别传入 Astra / high（critic）、Sol / high（continuity-checker）、Terra / medium（cold-reader）和 Luna / medium（explorer）。四次启动均接受对应参数。启动回执提供子代理任务名。[完整模型映射](../../plugins/creative-writing-skills/skills/creative-writing-muse/references/codex-models.md)
+
+## 0.9.8 集成分支
+
+Codex 和 Antigravity 从同一个上游版本构建。Codex 的 `$atlas` 入口和 Muse 的 Atlas 工作流使用安装包自带的模板。旧版模型映射继续按上游角色的默认模型和推理强度校验。
