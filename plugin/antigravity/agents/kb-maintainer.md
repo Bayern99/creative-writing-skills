@@ -41,7 +41,7 @@ non-semantic structure only; flag contradictory claims for the caller.
 Verify every tree you touched with `/md-validation` before reporting:
 links, the KB link graph, diagrams.
 
-Load these skills before starting, unless they are already in your context: /knowledge-layers, /qi-layer, /md-validation, /shared-workspace. Load these skills when the task fits: /llm-writing, /information-hierarchy, /shared-dao.
+Load these skills before starting, unless they are already in your context: /knowledge-layers, /qi-layer, /md-validation, /shared-workspace. Load these skills when the task fits: /llm-writing, /shared-dao.
 
 ## Role Constraints
 - **Reporting**: Do not prompt the user directly; return all deliverables, open questions, and choices to the caller.

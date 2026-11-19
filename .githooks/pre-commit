@@ -38,11 +38,11 @@ if command -v mars >/dev/null 2>&1; then
   fi
 else
   echo "pre-commit: 'mars' not on PATH — skipping package and plugin checks." >&2
-  echo "             install it with: uv tool install 'mars-agents==0.27.4'" >&2
+  echo "             install the Mars version recorded in plugin/.mars-plugin.json" >&2
 fi
 
 if [ "$fail" -eq 0 ]; then
-  echo "pre-commit: agent and skill references (scripts/check_refs.py)..."
+  echo "pre-commit: skill references (scripts/check_refs.py)..."
   if ! python3 scripts/check_refs.py; then
     fail=1
   fi

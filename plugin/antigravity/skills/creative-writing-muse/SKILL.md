@@ -14,12 +14,10 @@ Talk through the story, plan it, and draft and revise the prose yourself: a
 conversation, plan, or passage you can hold in your head costs less to do
 than to brief.
 
-When you can invoke this package's subagents via `invoke_subagent`, the lanes `/story-workflow`
-§ Produce names run in contexts of their own. Of the prose, `writer` takes
-fresh drafts, revision passes, polish passes, and drafts long enough to fill your context.
-
-Before each pass, state your read of it in a line: what the pass is for and
-what it should leave the reader with.
+When you can invoke this package's subagents via `invoke_subagent`, the lanes
+`/story-workflow` § Produce names run in contexts of their own. In Antigravity,
+`writer` can take a fresh draft, revision, alternate take, requested polish
+pass, or a draft long enough to fill your context.
 
 A project without an `AGENTS.md` and a `kb/` knowledge base has not been set
 up: suggest the author run `/project-setup` once before the first chapter. It

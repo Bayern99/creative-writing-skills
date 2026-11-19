@@ -50,6 +50,7 @@ optional_skills = [
   "skills/shared-dao",
   "skills/grill",
   "skills/structured-artifact",
+  "skills/atlas",
 ]
 subagents = [
   "brainstormer",
@@ -134,8 +135,8 @@ tools = [
 skills = [
   "skills/story-planning",
   "skills/story-memory",
-  "skills/md-validation",
 ]
+optional_skills = ["skills/md-validation"]
 
 [agents.style-creator]
 model = "inherit"
@@ -176,7 +177,6 @@ tools = [
 skills = [
   "skills/character-sim",
   "skills/writing-principles",
-  "skills/llm-writing",
 ]
 optional_skills = [
   "skills/story-memory",
@@ -218,7 +218,6 @@ tools = [
 ]
 skills = [
   "skills/story-review",
-  "skills/md-validation",
   "skills/shared-dao",
   "skills/story-memory",
 ]
@@ -238,7 +237,6 @@ tools = [
 skills = [
   "skills/reader-sim",
   "skills/writing-principles",
-  "skills/llm-writing",
 ]
 
 [agents.creative-researcher]
@@ -286,7 +284,6 @@ skills = [
 optional_skills = [
   "skills/qi-layer",
   "skills/shared-dao",
-  "skills/information-hierarchy",
   "skills/intent-modeling",
   "skills/shared-workspace",
   "skills/md-validation",
@@ -317,7 +314,7 @@ model = "flash"
 mainAgent = false
 subagent = true
 role = "reviewer"
-description = "Finds where earlier sessions discuss a question. Returns each passage's session, line positions, how to open it, and a one-line topic note. The caller reads the passages and judges what they settled."
+description = "Finds where earlier sessions discuss a question. Returns the author's exact words from each passage with its transcript location so the caller can read the surrounding context."
 tools = [
   "view_file",
   "list_dir",
@@ -346,7 +343,6 @@ skills = [
 ]
 optional_skills = [
   "skills/intent-modeling",
-  "skills/information-hierarchy",
 ]
 
 [agents.kb-maintainer]
@@ -372,6 +368,51 @@ skills = [
 ]
 optional_skills = [
   "skills/llm-writing",
-  "skills/information-hierarchy",
   "skills/shared-dao",
+]
+
+[agents.setup]
+model = "inherit"
+mainAgent = true
+subagent = false
+description = "Sets up a writing project with the author. Interviews them about the project and its voice, then creates the approved project files and knowledge base."
+tools = [
+  "view_file",
+  "list_dir",
+  "find_by_name",
+  "grep_search",
+  "write_to_file",
+  "replace_file_content",
+  "multi_replace_file_content",
+  "ask_question",
+]
+skills = ["skills/project-setup"]
+optional_skills = [
+  "skills/creative-writing-craft",
+  "skills/story-memory",
+]
+
+[agents.spark]
+model = "inherit"
+mainAgent = true
+subagent = false
+description = "Low-cost creative partner for brainstorming, craft advice, and drafting in one session."
+tools = [
+  "view_file",
+  "list_dir",
+  "find_by_name",
+  "grep_search",
+  "write_to_file",
+  "replace_file_content",
+  "multi_replace_file_content",
+  "ask_question",
+]
+skills = [
+  "skills/creative-writing-craft",
+  "skills/writing-principles",
+]
+optional_skills = [
+  "skills/story-review",
+  "skills/story-planning",
+  "skills/story-memory",
 ]

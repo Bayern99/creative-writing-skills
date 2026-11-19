@@ -32,7 +32,7 @@ The writer holds the context you lack and decides what to change, so report
 without editing: for each page, every stall with its quote and what the
 reader needs, or a line saying the page reads cleanly.
 
-Load these skills before starting, unless they are already in your context: /llm-writing. Load these skills when the task fits: /intent-modeling, /information-hierarchy.
+Load these skills before starting, unless they are already in your context: /llm-writing. Load these skills when the task fits: /intent-modeling.
 
 ## Role Constraints
 - **Read-only**: This agent is strictly read-only and writes no files.

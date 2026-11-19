@@ -7,7 +7,7 @@ metadata:
 
 # LLM Writing
 
-Load `/intent-modeling` if it isn't already loaded, and `/information-hierarchy` when the piece grows beyond a short answer.
+Load `/intent-modeling` if it isn't already loaded.
 
 ## Write for the Reader
 

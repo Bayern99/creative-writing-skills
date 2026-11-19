@@ -5,13 +5,14 @@ specialist agents draft, critique, simulate readers and keep the story's KB. The
 source ships to meridian-cli and Claude Code projects through `mars add`, as a plugin for
 Claude Code, Codex, Cursor and OpenCode, and as Claude.ai skill zips on each GitHub
 Release. Codex, OpenCode and Claude.ai users get the skills but no agents.
+
 This fork also generates a native Google Antigravity plugin in `plugin/antigravity/`.
 
 ## Rules
 
 - **Write muse's method into the skills.** `creative-writing-muse` and `story-workflow`
   are the only copy of how muse works; the `muse` agent body holds only its job, the
-  verdict it owns, the `@kb-lead` hand-off and its report. Behavior written into the
+  verdict it owns, and that the author has the final say. Behavior written into the
   agent body never reaches the users who get skills but no agents. The split mirrors
   meridian-dev-workflow's `/solo-dev` and `/dev-workflow`, so a lesson from one package
   has an obvious home in the other.
@@ -38,16 +39,34 @@ This fork also generates a native Google Antigravity plugin in `plugin/antigravi
 ```bash
 meridian mars build plugin                         # rebuild plugin/ and the catalogs
 meridian mars check                                # package, frontmatter, stale plugin output
-python3 scripts/check_refs.py                      # every @agent and /skill in plugin/claude resolves
+python3 scripts/check_refs.py                      # every skill reference in plugin/claude resolves
 claude plugins validate plugin/claude              # plugin manifest and components
 claude plugins validate .claude-plugin/marketplace.json
 python3 scripts/create_skill_zips.py               # Claude.ai zips/*.skill (CI does this on release)
+meridian -C "$PWD" mars version patch --push --no-tag   # release: bump, rebuild, commit, push; CI tags
 git config core.hooksPath .githooks                # once per clone: run these checks at commit
 ```
 
-Rebuild, then run `check_refs.py`, after any edit that names an agent or a skill: it
-fails when the dependency filters drop something a shipped file names. The pre-commit
+Rebuild, then run `check_refs.py`, after any edit that names a skill: it fails when
+the dependency filters drop a skill a shipped file names. It can't see agent names, which
+are plain backticked words, so when a shipped file names a new agent, add it to the
+`agents` include list in `mars.toml` yourself. The pre-commit
 hook skips its Mars checks when bare `mars` isn't on PATH.
+
+## Releasing
+
+`mars version patch --push --no-tag` (minor when the scope warrants it) promotes
+`[Unreleased]`, rebuilds `plugin/` so the marketplace `ref` names the new version,
+commits and pushes the branch, and makes no tag. `.github/workflows/release.yml` runs
+on that push: when `mars.toml`'s version has no tag, it runs `ci.yml`, then
+`scripts/check_release.sh` (the version in every file, the `## [V]` changelog section),
+and only then tags the commit and creates the GitHub Release with the `.skill` zips and
+that changelog section. Mars users, the zips and the Claude Code marketplace all serve
+that one tagged commit.
+
+A failed run means no release and no tag: fix the cause, push, and the next push
+retries. Releasing the same version again deletes nothing, because no tag exists.
+`../AGENTS.md` still tags locally for the other packages, which have no CI.
 
 ## Antigravity target
 
@@ -57,16 +76,17 @@ resolved `plugin/claude/` tree. Never hand-edit the generated target. Review
 upstream changes before updating SHA-256 patch gates; a changed hash is a prompt
 to inspect the source, not to accept it blindly.
 
-Mars 0.27.4 owns and replaces the whole `plugin/` output directory. When building
-both distributions, run Mars first and the Antigravity generator second, then
-compare the complete generated tree. CI and the pre-commit hook use that order.
+Use the Mars version recorded in `plugin/.mars-plugin.json`. Mars replaces the
+whole `plugin/` output directory, so run it first and the Antigravity builder
+second. CI and the pre-commit hook check the resulting tree.
 
 The model policy is `inherit` for Muse, Writer, Critic, Outliner, Style Creator,
 and KB Lead, and `flash` for the other nine specialists. The author freely
 selects the main-session model. For example, selecting Gemini 4 Hydrogen
 gives Hydrogen + Flash operation; selecting Argon makes the inherited
 specialists use Argon too. Use native
-`invoke_subagent` conversations with the documented tier values.
+`invoke_subagent` conversations with the documented tiers. Spark and Setup
+are primary-only agents and use the session model.
 
 The Antigravity adaptation keeps Writer available for fresh drafts and revisions
 as well as alternate takes, polish, and long drafts; keep its guides aligned with
@@ -92,16 +112,16 @@ routing declarations, and dispatch instructions.
 - **Muse runs the lifecycle from `/story-workflow`.** On the next muse
   sessions, and the next claude.ai or Codex sessions with
   `creative-writing-muse` on: it states its read in a line instead of a
-  question list; it drafts in its own context and spawns `@writer` only for
+  question list; it drafts in its own context and spawns `writer` only for
   an alternate take, an author-asked polish pass, or a very long draft; every
   plan marks confirmed versus provisional parts; after two critique rounds on
   a chapter it presents the open concerns and lets the author decide.
-- **`@kb-lead` briefs name what settled.** When a chapter or ruling
-  settles, muse spawns `@kb-lead` with what settled and the files that show
+- **`kb-lead` briefs name what settled.** When a chapter or ruling
+  settles, muse spawns `kb-lead` with what settled and the files that show
   it, and a trial direction lands in the kb as a trial, not canon (#10). If
   trials still harden, story-memory needs the three kinds of story knowledge
   #10.1 proposes.
-- **`@critic` covers editorial review.** Asked for an editorial review, a
+- **`critic` covers editorial review.** Asked for an editorial review, a
   critic reads the whole draft before writing,
   leads with the overall diagnosis, orders notes by reader cost, and writes
   no replacement prose. Callers name a focus area or an edit level; a critic
@@ -114,3 +134,4 @@ routing declarations, and dispatch instructions.
 - **Staffing says "tell it to load", not "attach" (#11).** Meridian muse runs
   still get the named skills onto the spawn, and Claude Code subagents load
   them when the brief names them.
+- **`spark` and `setup` are primaries.** On their first real runs: spark drafts and advises without trying to spawn, and points to muse for critique lanes; setup, which preloads the user-invoked `/project-setup`, runs the interview and writes nothing before the author approves it.

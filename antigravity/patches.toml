@@ -3,7 +3,7 @@
 
 [[patches]]
 file = "skills/project-setup/SKILL.md"
-sha256 = "2cab923302a1bf993ff574bee24969f2515b603b7723f9ca574125f8331e93a0"
+sha256 = "ae1a910b8f4e616b0bb57d1727d9b25d4d21340a607301a7ce796f5e8bb4d37e"
 description = "Replace multi-harness selection with Antigravity walkthrough"
 search = """## First, Load One Environment Walkthrough
 
@@ -15,17 +15,15 @@ one of these and follow its setup and walkthrough:
 - `resources/claude-desktop.md` — claude.ai, Claude Desktop, or Cowork.
 - `resources/other-harnesses.md` — Codex, Cursor, OpenCode, or Grok.
 
-Do not load the others. Meridian Flow, the writing app, has no setup path yet:
-it will import packages once its importer ships, so use the environment you are
-in."""
+Do not load the others."""
 replace = """## First, Load the Antigravity Setup Guide
 
-Follow the setup and walkthrough in `resources/antigravity.md`:
-Run `/project-setup` in Antigravity Desktop or CLI, then select `muse` as your main agent in the Agent selector."""
+Read `resources/antigravity.md` for the Antigravity workspace and agent
+options, then continue the setup interview below."""
 
 [[patches]]
 file = "skills/writing-staffing/SKILL.md"
-sha256 = "78c68a2cfda20c8e4f3c5106081dac44730c495c4001a19c29c1e4c1148d2dfc"
+sha256 = "04e32d886a8e854b3858f6b725ea65051137dba2afecb74bab230182d67d6c97"
 description = "Replace meridian spawn and model family fan-out with native invoke_subagent"
 search = """## Model Selection
 
@@ -38,9 +36,8 @@ needs a capability its default lacks.
 families, for a high-stakes or disputed call where their different blind spots
 are the point. A family is a provider: Opus, Sonnet and Fable are one family, so
 two Anthropic models add no diversity. Your harness's own agent tool usually
-reaches only its own provider, so fan out with `meridian spawn -m <model>`, and
-check the live catalog (`meridian mars models list`) and its prompting guidance
-(`meridian mars models prompting`) at dispatch time."""
+reaches only its own provider, so fan out through a runtime that reaches
+another (in Meridian, `meridian spawn -m <model>`)."""
 replace = """## Model Selection & Multi-Agent Dispatch
 
 In Antigravity, invoke agents via `invoke_subagent`. See `resources/antigravity-dispatch.md` for full dispatch patterns.
@@ -51,24 +48,24 @@ The author selects the primary session model in the App/CLI. `muse` and the five
 
 **Multi-turn conversations**: `writer` retains context while idle. Use `send_message` to send round-2 revision feedback to the same `writer` instance to keep voice consistent. For reviewers (`critic`, `reader-sim`), open fresh instances each round for a clean cold-read perspective."""
 
-
 [[patches]]
 file = "skills/creative-writing-muse/SKILL.md"
-sha256 = "799e945b3a85f8227f3d4f5d0cd9e5bc2dbbaa401de7e0046fd0a5189364e129"
+sha256 = "b84f40f2884be90af1504e29fb4041dd2ad02acf1263f0347a0fc91a2e32fb2c"
 description = "Update muse agent delegation wording for invoke_subagent"
 search = """When you can spawn this package's agents, the lanes `/creative-writing-skills:story-workflow`
-§ Produce names run in contexts of their own. Of the prose, `@writer` takes
+§ Produce names run in contexts of their own. Of the prose, `writer` takes
 only an alternate take on another model, a polish pass the author asks for,
 and a draft long enough to fill your context."""
-replace = """When you can invoke this package's subagents via `invoke_subagent`, the lanes `/story-workflow`
-§ Produce names run in contexts of their own. Of the prose, `writer` takes
-fresh drafts, revision passes, polish passes, and drafts long enough to fill your context."""
+replace = """When you can invoke this package's subagents via `invoke_subagent`, the lanes
+`/story-workflow` § Produce names run in contexts of their own. In Antigravity,
+`writer` can take a fresh draft, revision, alternate take, requested polish
+pass, or a draft long enough to fill your context."""
 
 [[patches]]
 file = "skills/story-workflow/SKILL.md"
-sha256 = "48ef642786e0b74f9ae58a5782e98409edccde718434858b55f370c72a8538cb"
+sha256 = "2e96db7cd00bdb23e161414054804ff71a223657daefe4fa7d7e4faf4d80f2ce"
 description = "Update story-workflow subagent dispatch syntax"
-search = """When you can spawn this package's agents (`@critic`, `@writer`, `@kb-lead`
+search = """When you can spawn this package's agents (`critic`, `writer`, `kb-lead`
 and the rest), spawn the lanes that need a context of their own, as
 `/creative-writing-skills:writing-staffing` describes: critique, continuity, reader simulation,
 research, alternate takes, and knowledge capture. A critic that did not
@@ -90,53 +87,76 @@ from the reader's side, revise the highest-impact issue first."""
 
 [[patches]]
 file = "agents/session-miner.md"
-sha256 = "2344f12f1c35c22fda22e83075706c4551ddbc7e45178384c965fd7cc8957102"
+sha256 = "9639ba6fd30d30e0b7e94b636ba10c2fef7ffce3634da0770c819218be8436da"
 description = "Locate Antigravity transcript passages for caller interpretation"
 search = """# Session Miner
 
 Find where past conversations discuss the question you were given, and
-point your caller to each passage. Your caller knows the work behind the
-question and you see only your brief, so it reads the passages itself to
-judge what they settled. Your notes say what each passage covers, so it can
-choose what to open.
+bring your caller the human's words from each passage. Your caller knows the
+work behind the question and you see only your brief, so it judges what the
+passages settled; a summary would put your reading in place of theirs.
 
-Before mining, read the runtime's guidance on reading past sessions.
+Before mining, read the runtime's guidance on reading past sessions. With
+none, read the harness's own transcript files.
 
 Search broadly: the terms in the question, their synonyms, and the names
 of the files and features involved. Cover where the topic starts, each
 place it shifts, and the last place it comes up; a later message can change
 an earlier one, so the last passage matters most.
 
-Report the passages grouped by topic, in conversation order. For each:
-the session and position, the exact command that opens it, as the
-runtime's search prints it, and one line on what is discussed there. Then
-list what you searched for and found nothing."""
+Report the passages grouped by topic, in conversation order. For each,
+quote verbatim the human's sentences that bear on the question, and the
+agent's lines they answer when the quote needs them to make sense. Give a
+cursor that opens the passage in one step: the open command your session
+tool prints for it, or the transcript file and line. Then list what you searched for and found nothing."""
 replace = """# Session Miner
 
-Find where past conversations discuss the question you were given, and
-point your caller to each passage. Your caller knows the work behind the
-question and you see only your brief, so it reads the passages itself to
-judge what they settled. Your notes say what each passage covers, so it can
-choose what to open.
+Find where past conversations discuss the question you were given and bring
+the caller the author's words. The caller reads around each quote and decides
+what was settled.
 
-Before mining, use the transcript or session history paths supplied by the caller and consult any available runtime guidance. Antigravity conversation logs may be located at `<appDataDir>/brain/<id>/.system_generated/logs/transcript.jsonl`; confirm the actual path with read-only file discovery.
+Use the transcript or session paths provided by the caller. If necessary,
+locate transcripts with Antigravity's read-only file tools. An Antigravity
+conversation can store logs at
+`<appDataDir>/brain/<id>/.system_generated/logs/transcript.jsonl`. Verify the
+actual file before citing it.
 
-Search broadly: the terms in the question, their synonyms, and the names
-of the files and features involved. Cover where the topic starts, each
-place it shifts, and the last place it comes up; a later message can change
-an earlier one, so the last passage matters most.
+Search for the question, related terms, and names of the relevant chapters
+or files. Follow each discussion from its first proposal to subsequent changes
+and the last decision.
 
-Report the passages grouped by topic, in conversation order. For each:
-the transcript path, exact message or line position, a short excerpt, and
-one line on what is discussed there. Preserve an opening command only when
-the runtime actually supplies one; otherwise give the file and read location.
-Then list what you searched for and found nothing."""
+Group passages by topic in conversation order. Quote the author's relevant
+sentences verbatim and include adjacent agent text when the quote needs it.
+Give the transcript path and exact message or line so the caller can open
+the passage. Report any searches that yielded no passage."""
 
 [[patches]]
 file = "skills/writing-sync/resources/installation.md"
-sha256 = "81a61d5183c10a8a77228c033f485c99e4a185791eb12ceb88996497648bccb7"
+sha256 = "d7138fd7f5ee0c5a5952c0b0d8d72f0eab7729573ed32bb78b6bf1f4f1208876"
 description = "Update drive-sync paths for Antigravity plugin location"
 search = """UV_PROJECT_ENVIRONMENT=/external/drive-sync-venv uv sync --locked --no-editable --project /path/to/skills/writing-sync
 /external/drive-sync-venv/bin/drive-sync --help"""
 replace = """UV_PROJECT_ENVIRONMENT=~/.local/share/drive-sync-venv uv sync --locked --no-editable --project ~/.gemini/config/plugins/creative-writing-skills/skills/writing-sync
 ~/.local/share/drive-sync-venv/bin/drive-sync --help"""
+
+[[patches]]
+file = "skills/atlas/SKILL.md"
+sha256 = "a0e6ad70ccb0ba492a8bb937ef83caf918987d08a61fde62170137956bdf6d68"
+description = "Locate and update the Atlas template in the Antigravity plugin"
+search = """check catches; `example/` is a working toy. A change to the engine goes to
+this skill's source in meridian-base, not to `.mars/` or the project's copy:
+sync rewrites `.mars/`, and the check fails when the copy differs from it."""
+replace = """check catches; `example/` is a working toy. Send engine changes to this
+skill's source in meridian-base so they can reach the Antigravity package on
+its next rebuild. Copy the resulting template into the project when updating the engine."""
+
+[[patches]]
+file = "skills/writing-staffing/resources/reviewers.md"
+sha256 = "fae7b06b3f75c8a6fbb18228b0ee56e3f3dbb1ffa1d55d3f28cbc26e45dac038"
+description = "Use available Antigravity model tiers for independent review"
+search = """scene, with the dimension the scene's purpose rides on covered twice. For a pivotal scene or a
+disputed judgment, fan the same lane out to two model families (SKILL.md § Model Selection) and
+synthesize where they disagree."""
+replace = """scene, with the dimension the scene's purpose rides on covered twice. For a
+pivotal scene or disputed judgment, use the Antigravity dispatch guide to
+choose independent passes and synthesize where they disagree."""

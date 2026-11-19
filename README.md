@@ -18,7 +18,7 @@ Write novels, short stories, and serial fiction with AI that maintains your voic
 
    | Environment | Run |
    |---|---|
-   | Google Antigravity 2.0 | `/project-setup` |
+   | Google Antigravity 2.0 | `/project-setup` or the `setup` agent |
    | meridian-cli | `meridian bootstrap` (runs automatically in your first session) |
    | Claude Code / Cowork | `/creative-writing-skills:project-setup` |
    | Claude.ai | turn on `project-setup` and ask it to set up your project |
@@ -69,7 +69,7 @@ meridian mars sync
 
 Then run `meridian` to start a meridian-cli session with muse. First-time setup runs the bootstrap automatically.
 
-`@writer` defaults to Opus at high effort.
+`writer` defaults to Opus at high effort.
 
 ### Claude Code / Cowork
 
@@ -160,6 +160,8 @@ flowchart TB
 | Agent | Role |
 |---|---|
 | **muse** | Author-facing creative partner for all story work: talks, plans, and drafts with you, spawns critique and knowledge capture, and owns the verdict |
+| **spark** | Budget creative partner with muse's posture: brainstorms, advises and drafts with you in one context, spawning no one |
+| **setup** | Runs `/project-setup` with you once, for runtimes where you start a chat with an agent instead of a skill |
 | **writer** | Production prose in one mode (draft, revision, bridge, alternate take, line polish) for passes that need their own session |
 | **critic** | Diagnoses a draft in one lane: a focus area (structure, character, voice, prose, continuity) or an edit level (editorial review, developmental, line edit, copyedit, proofreading) |
 | **reader-sim** | Experiential reader response to a draft, moment by moment |
@@ -192,7 +194,7 @@ Knowledge extraction into the kb in harnesses without agents stays in the conver
 | **shared-dao** | Shared vocabulary: canonical story terms, aliases, and ambiguity resolution |
 | **project-setup** | One-time guided setup (user-invoked): interviews you, then creates AGENTS.md, the kb layout, and style files |
 
-The plugin also ships the shared `meridian-base` skills its agents load: `correct` to fix a class of repeated mistake at the strongest level that holds, `zoom-out` for orienting in an unfamiliar area, and `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `intent-modeling`, `md-validation`, `reflect`, `shared-workspace`, and `structured-artifact` for the rest of the knowledge and craft discipline.
+The plugin also ships the shared `meridian-base` skills its agents load: `knowledge-layers`, `qi-layer`, `qi-maintenance`, `intent-modeling`, `md-validation`, `shared-workspace`, and `structured-artifact`, for the knowledge and craft discipline.
 
 ## Project Layout
 

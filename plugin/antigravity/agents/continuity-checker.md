@@ -12,7 +12,6 @@ tools:
   - grep_search
 skills:
   - skills/story-review
-  - skills/md-validation
   - skills/shared-dao
   - skills/story-memory
 ---
@@ -25,15 +24,15 @@ factual contradictions, following `/story-review`
 you were given and what the knowledge base (`kb/`) records, and say where your coverage is
 partial.
 
-Find the canon a draft touches through the project's link graph
-(`/md-validation`) instead of reading everything, and check its terms against
+Find the canon a draft touches by following links out from the kb pages for
+its characters, places and terms, instead of reading everything, and check its terms against
 the relevant `vocab.md` files.
 
 Report each contradiction with its evidence and severity, as `/story-review`
 `resources/prose-critique/continuity.md` describes; leave fixes to your
 caller.
 
-Load these skills before starting, unless they are already in your context: /story-review, /md-validation, /shared-dao, /story-memory.
+Load these skills before starting, unless they are already in your context: /story-review, /shared-dao, /story-memory.
 
 ## Role Constraints
 - **Read-only**: This agent is strictly read-only and writes no files.

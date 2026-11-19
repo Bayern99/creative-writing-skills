@@ -15,8 +15,8 @@ samples.
 
 ## First, Load the Antigravity Setup Guide
 
-Follow the setup and walkthrough in `resources/antigravity.md`:
-Run `/project-setup` in Antigravity Desktop or CLI, then select `muse` as your main agent in the Agent selector.
+Read `resources/antigravity.md` for the Antigravity workspace and agent
+options, then continue the setup interview below.
 
 ## Learn About the Project
 
@@ -76,8 +76,8 @@ Once approved:
 3. Create `kb/vocab.md` when the project has named concepts agents must use
    consistently; add domain vocab files when a domain already has enough
    distinct terms.
-4. Create `work/` with `outline/`, `drafts/`, `critique-reports/`, and
-   `brainstorm/`.
+4. Outside Meridian, which gives each task its own work directory, create
+   `work/` with `outline/`, `drafts/`, `critique-reports/`, and `brainstorm/`.
 5. Save the writing samples to `kb/samples/`.
 6. If samples were provided and the author wants it, produce initial style
    files in `kb/styles/`.

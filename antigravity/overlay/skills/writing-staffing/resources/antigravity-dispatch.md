@@ -13,6 +13,9 @@ The system operates as a tiered hub-and-spoke hierarchy:
 - **Research & Simulation lanes** (`creative-researcher`, `character-sim`) provide factual grounding and interactive dialogue testing.
 - **Sub-orchestrator** `kb-lead` manages knowledge capture lanes (`explorer`, `session-miner`, `cold-reader`, `kb-maintainer`).
 
+
+`spark` and `setup` are primary-only sessions. They use the author-selected model and work without subagents.
+
 ---
 
 ## 2. Model Tier Allocation
@@ -21,7 +24,7 @@ The system operates as a tiered hub-and-spoke hierarchy:
 - **Inherited specialists**: `writer`, `critic`, `outliner`, `style-creator`, and `kb-lead` use `model: inherit` for prose, critique, structure, voice, and knowledge judgments.
 - **Flash specialists**: `brainstormer`, `character-sim`, `continuity-checker`, `reader-sim`, `creative-researcher`, `explorer`, `session-miner`, `cold-reader`, and `kb-maintainer` use `model: flash`.
 
-`inherit` selects the calling agent's model; it is not an independent Hydrogen pin. Changing the main model changes the inherited specialists too. Flash currently resolves to Gemini 3.8 Flash. Inspect the resolved child model when verifying a run, and report the observed model rather than inferring it from the role name. See [plugin model tiers](https://antigravity.google/docs/build-plugins) and [model selection](https://antigravity.google/docs/models).
+`inherit` selects the calling agent's model; it is not an independent Hydrogen pin. Changing the main model changes the inherited specialists too. Antigravity resolves the Flash tier. Inspect the resolved child model when verifying a run, and report the observed model rather than inferring it from the role name. For a disputed scene, separate contexts and prompts provide independent readings, even when the lanes share a model family. See [plugin model tiers](https://antigravity.google/docs/build-plugins) and [model selection](https://antigravity.google/docs/models).
 
 ---
 
@@ -32,7 +35,7 @@ Per the official Antigravity Hooks and Subagents documentation, `invoke_subagent
 Use each bundled agent's `model: inherit` or `model: flash` frontmatter for the role allocation above. The examples use the fields documented in the [Hooks reference](https://antigravity.google/docs/hooks). Follow the active runtime's tool schema for any additional parameters; keep model slugs out of these tier-based examples.
 
 ### Parallel Review Lanes
-When a draft is ready for review, `muse` spawns multiple review lanes concurrently in a single tool call:
+When a draft is ready for review, `muse` can dispatch independent diagnostic lanes in a single tool call:
 
 ```json
 {
@@ -48,16 +51,12 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
       "Role": "Canon Continuity Auditor",
       "Prompt": "Cross-reference chapter 3 draft at work/drafts/ch03.md against kb/timeline/timeline.md and kb/characters/alyssa.md. Flag any chronological or state contradictions.",
       "Workspace": "inherit"
-    },
-    {
-      "TypeName": "reader-sim",
-      "Role": "Experiential Reader Reaction",
-      "Prompt": "Perform an experiential cold read of work/drafts/ch03.md as a first-time fantasy reader. Record moment-by-moment emotional turns and confusions.",
-      "Workspace": "inherit"
     }
   ]
 }
 ```
+
+Once the critique rounds converge, launch a fresh `reader-sim` with the revised pages and the reader's knowledge boundary.
 
 ---
 
@@ -75,9 +74,9 @@ When a draft is ready for review, `muse` spawns multiple review lanes concurrent
   ```
 - This preserves stylistic momentum and prevents repetition.
 
-### B. Fresh Cold Reads (`critic`, `reader-sim`)
-- Reviewers must always provide an unvarnished, unbiased critique.
-- If a draft is revised, spawn a **fresh** instance of `critic` or `reader-sim`. A reviewer that saw the earlier revision draft loses its clean naive reader perspective.
+### B. New Review Contexts
+- For a new critique round, give a fresh `critic` the revised draft and prior findings for that same lane.
+- Give `reader-sim` a fresh context with the text the reader would see.
 
 ---
 

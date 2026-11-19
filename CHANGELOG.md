@@ -3,15 +3,99 @@
 ## [Unreleased]
 
 ### Antigravity fork
-- Sync the native plugin with upstream 0.7.7 and meridian-base 0.15.1: topic-based choice capture, `/grill`, source-passage session mining, and updated knowledge maintenance.
-- Let Writer, Critic, Outliner, Style Creator, and KB Lead inherit the selected main model; keep the other nine specialists on the Flash tier. For example, choosing Gemini 4 Hydrogen gives Hydrogen + Flash operation.
-- Document the App's Software Engineering layout and Overview > Subagents controls for following native child conversations.
-- Match upstream's Mars 0.27.4 builder and regenerate Antigravity after Mars in CI and pre-commit checks, before comparing the complete plugin tree.
+
+- Sync the native plugin to upstream 0.9.8 and meridian-base 0.18.1. Add Atlas with its bundled viewer and the primary-only `spark` and `setup` agents.
+- Rebuild with the Mars version recorded in the upstream manifest.
+
+## [0.9.8] - 2026-11-19
+
+### Changed
+- Agents are named in backticks without `@` (`explorer`, not `@explorer`): in Claude Code a bare `@path` in a skill or AGENTS.md loads that file. `scripts/check_refs.py` now checks skill references only; agent names are checked by hand against the include list. Bundles meridian-base 0.18.1.
+
+## [0.9.7] - 2026-11-19
+
+### Added
+- muse can load meridian-base's `/atlas`, for maps of a story's cast, factions and plot you click down through.
+
+### Changed
+- Requires and bundles meridian-base 0.18.0.
+
+## [0.9.6] - 2026-11-18
+
+### Removed
+- Plugin no longer ships meridian-base's `/information-hierarchy`, which meridian-base removed.
+
+### Changed
+- Requires and bundles meridian-base 0.17.0.
+
+## [0.9.5] - 2026-11-16
+
+### Changed
+- Plugin bundles meridian-base 0.16.7 (`/intent-modeling`).
+
+## [0.9.4] - 2026-11-16
+
+### Changed
+- Plugin bundles meridian-base 0.16.6 (`/explore-and-engage`, `/intent-modeling`, `/knowledge-layers`).
+
+## [0.9.3] - 2026-11-16
+
+### Changed
+- Plugin bundles meridian-base 0.16.5's `/explore-and-engage`.
+
+## [0.9.2] - 2026-11-16
+
+### Changed
+- Plugin bundles meridian-base 0.16.2's `/explore-and-engage`.
+
+## [0.9.1] - 2026-11-16
+
+### Changed
+- Bundles meridian-base 0.16.1's `/explore-and-engage`: bring the author only what is still open and waits on them.
+
+## [0.9.0] - 2026-11-16
+
+### Added
+- `spark`, a primary Agent: a budget creative partner with muse's posture that drafts in its own context and spawns no one (Sonnet by default, effort medium).
+- `setup`, a primary Agent that runs `/project-setup` with the author, for runtimes where the author starts a chat with an Agent instead of a skill.
+
+## [0.8.0] - 2026-11-16
+
+### Changed
+- Cleanup. Fixed contradictions: the writer's model "show, don't tell" line was the stock tell critics flag (now a character-specific behavior); copyedit lanes "fix silently" though critics can't edit (they now list corrections); praise both banned and asked for; brainstormers told to load web research they can't run (spawn `@creative-researcher` instead).
+- One AI-prose catalog: `/writing-principles` `resources/antipatterns.md` now holds stock tells, syntactic templating, attractor-state fluency and emotional inflation; the critic's prose focus and `failure-modes.md` point to it.
+- What reaches the kb, and where the work directory is, live in `/story-memory` `resources/kb-layout.md` (`writing-artifacts.md` merged in and deleted; a brainstorm finishing no longer "promotes" decisions). The work directory is the runtime's when it has one, else project `work/`, which project-setup creates only outside Meridian.
+- Removed: the "A Chapter" retellings in the setup walkthroughs (they had drifted from `/story-workflow`), the stale Mars 0.20 and Meridian Flow lines, `citations.md` (moved to `docs/research/`), handoff lists that copied agent descriptions, duplicate voice-distinction and "state your read" lines. `/llm-writing` no longer loads into character-sim and reader-sim; continuity-checker drops `/md-validation` (it follows kb links); outliner has it available only. Fan-out names Meridian only as one runtime that reaches another provider.
+- "Orchestrator" in story-memory and craft resources now says muse, your caller or the author; creative-researcher's description says what to pass and what comes back.
+- Claude.ai zips skip skills that ship a CLI (`writing-sync`), which can't run there. `brainstorming.md` separates the brainstormer's report from capturing the author's ideas.
+- The plugin no longer ships `correct`, `reflect` or `zoom-out`: nothing in the package names them, and `/correct` targets code-repo docs.
+- muse is `mode: primary`. Without it Meridian treated muse as a subagent and hid its lead-only skills (the handoff launch, work items, notify), so a muse handoff ended at the brief's path with no command.
+- Bundles `/explore-and-engage` from meridian-base: `/grill` loads it for how to ask (questions grouped by the decision each settles, each with background and a recommended answer).
+- Requires meridian-base 0.16.
+
+## [0.7.9] - 2026-11-15
+
+### Changed
+- CI tags each release after every check passes on that commit, so a failing commit no longer becomes a release. The Claude Code marketplace now installs the tagged release instead of `main`.
+
+## [0.7.8] - 2026-11-15
+
+### Changed
+- Requires Mars 0.34.0 and writing-sync 0.2.0. Mars 0.34.0 no longer reads writing-sync 0.1.x, which was published before schema 1.
+
+### Fixed
+- CI and releases install the Mars version that built the committed plugin, so they no longer fail on a stale plugin check after the author upgrades Mars.
 
 ## [0.7.7] - 2026-11-11
 
 ### Changed
 - Requires meridian-base 0.15 (`/correct` fixes causes instead of logging corrections; the corrections register is gone).
+
+### Antigravity fork
+- Sync the native plugin with upstream 0.7.7 and meridian-base 0.15.1: topic-based choice capture, `/grill`, source-passage session mining, and updated knowledge maintenance.
+- Let Writer, Critic, Outliner, Style Creator, and KB Lead inherit the selected main model; keep the other nine specialists on the Flash tier. For example, choosing Gemini 4 Hydrogen gives Hydrogen + Flash operation.
+- Document the App's Software Engineering layout and Overview > Subagents controls for following native child conversations.
+- Match upstream's Mars 0.27.4 builder and regenerate Antigravity after Mars in CI and pre-commit checks, before comparing the complete plugin tree.
 
 ## [0.7.6] - 2026-11-11
 

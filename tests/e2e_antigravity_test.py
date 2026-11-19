@@ -9,10 +9,10 @@ Current Requirements & Specifications:
     * 0 errors and 0 warnings with `agy plugin validate --strict`.
     * Native multi-agent orchestration via `invoke_subagent`.
 - PROJECT.md:
-    * 15 agents: muse (orchestrator), writer, character-sim, outliner, critic, brainstormer,
+    * 17 agents: muse (orchestrator), writer, character-sim, outliner, critic, brainstormer,
       continuity-checker, reader-sim, style-creator, creative-researcher, kb-lead, explorer,
-      session-miner, cold-reader, kb-maintainer.
-    * 27 skills from upstream closure (12 native, 14 meridian-base, 1 writing-sync).
+      session-miner, cold-reader, kb-maintainer, setup, spark.
+    * 25 skills from upstream closure (12 native, 12 meridian-base, 1 writing-sync).
     * Overlay assets, rules (story-project.md, kb-pages.md), hooks.json, and git_guard.py.
     * Complete elimination of Claude/Mars artifacts (opus, sonnet, argon, disallowedTools, etc.).
 - spec_miner_antigravity/handoff.md:
@@ -80,10 +80,13 @@ EXPECTED_AGENTS = [
     "session-miner",
     "cold-reader",
     "kb-maintainer",
+    "setup",
+    "spark",
 ]
 
-ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
-INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
+PRIMARY_ONLY = {"muse", "setup", "spark"}
+ENTRY_AGENTS = PRIMARY_ONLY | {"writer", "character-sim", "outliner"}
+INHERIT_MODEL_AGENTS = PRIMARY_ONLY | {"writer", "critic", "outliner", "style-creator", "kb-lead"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -108,13 +111,13 @@ REVIEWER_AGENTS = {
 }
 
 EXPECTED_SKILLS = [
+    "atlas",
     "character-sim",
-    "correct",
     "creative-research",
     "creative-writing-craft",
     "creative-writing-muse",
+    "explore-and-engage",
     "grill",
-    "information-hierarchy",
     "intent-modeling",
     "knowledge-layers",
     "llm-writing",
@@ -123,7 +126,6 @@ EXPECTED_SKILLS = [
     "qi-layer",
     "qi-maintenance",
     "reader-sim",
-    "reflect",
     "shared-dao",
     "shared-workspace",
     "story-memory",
@@ -134,7 +136,6 @@ EXPECTED_SKILLS = [
     "writing-principles",
     "writing-staffing",
     "writing-sync",
-    "zoom-out",
 ]
 
 ALLOWED_MODEL_TIERS = {"inherit", "flash", "flash_lite", "pro"}
@@ -409,8 +410,8 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             f"Default commandExecutionPolicy must be 'sandbox', got '{defaults.get('commandExecutionPolicy')}'.",
         )
 
-    def test_t1_11_all_15_agents_declared_in_config(self):
-        """agents.toml explicitly declares configurations for all 15 agents."""
+    def test_t1_11_all_agents_declared_in_config(self):
+        """agents.toml explicitly declares configurations for all 17 agents."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         agents_table = config.get("agents", {})
@@ -421,8 +422,8 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             f"Missing agent definitions in agents.toml: {missing}",
         )
 
-    def test_t1_12_all_15_target_agent_files_exist(self):
-        """All 15 agent markdown files exist in plugin/antigravity/agents/ (M3 deliverable)."""
+    def test_t1_12_all_target_agent_files_exist(self):
+        """All 17 agent markdown files exist in plugin/antigravity/agents/ (M3 deliverable)."""
         if not TARGET_AGENTS_DIR.exists():
             self.assertTrue(
                 TARGET_AGENTS_DIR.exists(),
@@ -489,15 +490,15 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
         for path in TARGET_AGENTS_DIR.glob("*.md"):
             fm, _ = parse_yaml_frontmatter(path.read_text(encoding="utf-8"))
             is_sub = fm.get("subagent") is True
-            expected_sub = path.stem != "muse"
+            expected_sub = path.stem not in PRIMARY_ONLY
             self.assertEqual(
                 is_sub,
                 expected_sub,
                 f"Agent {path.stem} subagent flag expected {expected_sub}, got {is_sub}.",
             )
 
-    def test_t1_17_all_27_skills_present(self):
-        """All 27 skill directories are present in plugin/antigravity/skills/."""
+    def test_t1_17_all_skills_present(self):
+        """All 25 skill directories are present in plugin/antigravity/skills/."""
         if not TARGET_SKILLS_DIR.exists():
             self.assertTrue(
                 TARGET_SKILLS_DIR.exists(),
@@ -563,6 +564,21 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
         for kf in key_files:
             self.assertTrue(kf.is_file(), f"Key skill resource missing: {kf}")
 
+    def test_atlas_viewer_assets_are_complete(self):
+        """Copy the complete Atlas template without corrupting its binary assets."""
+        source = SOURCE_CLAUDE_DIR / "skills" / "atlas" / "assets"
+        output = TARGET_SKILLS_DIR / "atlas" / "assets"
+        self.assertEqual(
+            {path.relative_to(output) for path in output.rglob("*") if path.is_file()},
+            {path.relative_to(source) for path in source.rglob("*") if path.is_file()},
+        )
+        image = Path("atlas/example/screens/publish.png")
+        self.assertEqual((output / image).read_bytes(), (source / image).read_bytes())
+
+        muse, body = parse_yaml_frontmatter((TARGET_AGENTS_DIR / "muse.md").read_text(encoding="utf-8"))
+        self.assertIn("/atlas", body)
+        self.assertNotIn("skills/atlas", muse["skills"])
+
     def test_t1_21_skill_disable_model_invocation_flags(self):
         """Manual/setup skills maintain disable-model-invocation: true."""
         skills_dir = (
@@ -574,7 +590,6 @@ class Tier1FeatureCoverageTests(unittest.TestCase):
             "creative-writing-muse",
             "project-setup",
             "qi-maintenance",
-            "reflect",
         ]
         for name in manual_skills:
             skill_md = skills_dir / name / "SKILL.md"
@@ -812,7 +827,7 @@ class Tier2BoundaryCornerCaseTests(unittest.TestCase):
             )
 
     def test_t2_11_skill_md_body_under_24k_bytes(self):
-        """All 27 SKILL.md body contents are strictly <= 24,000 bytes (prevents validator cutoff warning)."""
+        """All 25 SKILL.md body contents are strictly <= 24,000 bytes (prevents validator cutoff warning)."""
         skills_dir = (
             TARGET_SKILLS_DIR
             if TARGET_SKILLS_DIR.exists()
@@ -1156,7 +1171,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
             )
 
     def test_t3_05_kb_lead_subagent_hierarchy(self):
-        """kb-lead delegates exclusively to explorer, session-miner, cold-reader, kb-maintainer."""
+        """kb-lead delegates exclusively to explorer, session-miner, cold-reader, kb-maintainer, setup, spark."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         kb_lead_subs = (
@@ -1175,7 +1190,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
         )
 
     def test_t3_06_agent_skills_exist_in_plugin_skills(self):
-        """Every skill referenced in agents.toml [agents.*.skills] exists in the 27 skills closure."""
+        """Every skill referenced in agents.toml [agents.*.skills] exists in the 25 skills closure."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         for agent_name, cfg in config.get("agents", {}).items():
@@ -1188,7 +1203,7 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
                 )
 
     def test_t3_07_agent_optional_skills_exist(self):
-        """Every optional skill referenced in agents.toml exists in the 27 skills closure."""
+        """Every optional skill referenced in agents.toml exists in the 25 skills closure."""
         with open(CONFIG_AGENTS_TOML, "rb") as fp:
             config = tomllib.load(fp)
         for agent_name, cfg in config.get("agents", {}).items():
@@ -1200,8 +1215,8 @@ class Tier3CrossFeatureCombinationTests(unittest.TestCase):
                     f"Agent '{agent_name}' references non-existent optional skill '{skill_name}'.",
                 )
 
-    def test_t3_08_all_27_skills_accounted_for(self):
-        """The total inventory of skills matches the 27 closure skills exactly."""
+    def test_t3_08_all_skills_accounted_for(self):
+        """The total inventory of skills matches the resolved closure exactly."""
         skills_dir = (
             TARGET_SKILLS_DIR
             if TARGET_SKILLS_DIR.exists()
@@ -1532,7 +1547,7 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_02_agy_plugin_validate_component_counts(self):
 
-        """Validate report confirms 15 agents and 27 skills discovered."""
+        """Validate report confirms 17 agents and 25 skills discovered."""
         if not TARGET_PLUGIN_DIR.exists():
             self.assertTrue(
                 TARGET_PLUGIN_DIR.exists(),
@@ -1545,8 +1560,8 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
         components = report.get("components", {})
         self.assertEqual(
             components.get("agents"),
-            15,
-            f"Expected 15 agents in validate components, got {components.get('agents')}",
+            len(EXPECTED_AGENTS),
+            f"Expected {len(EXPECTED_AGENTS)} agents in validate components, got {components.get('agents')}",
         )
         self.assertEqual(
             components.get("skills"),
@@ -1682,14 +1697,14 @@ class Tier4RealWorldScenarioTests(unittest.TestCase):
             self.assertTrue(match.get("enabled"))
             agents_val = match.get("agents")
             agents_count = len(agents_val) if isinstance(agents_val, list) else agents_val
-            self.assertEqual(agents_count, 15)
+            self.assertEqual(agents_count, len(EXPECTED_AGENTS))
             skills_val = match.get("skills")
             skills_count = len(skills_val) if isinstance(skills_val, list) else skills_val
             self.assertEqual(skills_count, len(EXPECTED_SKILLS))
 
     @unittest.skipUnless(shutil.which("agy"), "agy CLI not found on PATH; skipping live CLI tests")
     def test_t4_07_agy_agents_discovery(self):
-        """Verify `agy agents` discovers declared entry agents (muse, writer, character-sim, outliner)."""
+        """Verify `agy agents` discovers all declared entry agents."""
         if not TARGET_PLUGIN_DIR.exists():
             self.assertTrue(
                 TARGET_PLUGIN_DIR.exists(),

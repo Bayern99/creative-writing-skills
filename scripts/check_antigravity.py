@@ -6,9 +6,9 @@ for creative-writing-skills Google Antigravity 2.0 native plugin.
 
 Checks:
 1. Manifest Integrity (plugin.json RFC 8259, kebab-case, semver, bounds)
-2. Agent Topology & Model Policy (15 agents, muse and 5 specialists: inherit, 9: flash,
+2. Agent Topology & Model Policy (17 agents, muse and 5 specialists: inherit, 9: flash,
    sandbox policy, mainAgent/subagent flags, role prompt constraints)
-3. Skill Completeness (27 skills, SKILL.md names match folders, descriptions,
+3. Skill Completeness (25 skills, SKILL.md names match folders, descriptions,
    body size <= 24,000 bytes, zero dangling resource links, key resources)
 4. Rules Conformance (story-project.md: model_decision, kb-pages.md: glob, body <= 24KB)
 5. Hooks & Safety Guards (hooks.json structure, git_guard.py executable chmod 0755)
@@ -48,10 +48,13 @@ EXPECTED_AGENTS = [
     "session-miner",
     "cold-reader",
     "kb-maintainer",
+    "setup",
+    "spark",
 ]
 
-ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
-INHERIT_MODEL_AGENTS = {"muse", "writer", "critic", "outliner", "style-creator", "kb-lead"}
+PRIMARY_ONLY = {"muse", "setup", "spark"}
+ENTRY_AGENTS = PRIMARY_ONLY | {"writer", "character-sim", "outliner"}
+INHERIT_MODEL_AGENTS = PRIMARY_ONLY | {"writer", "critic", "outliner", "style-creator", "kb-lead"}
 SUBAGENT_ONLY = {
     "critic",
     "brainstormer",
@@ -76,13 +79,13 @@ REVIEWER_AGENTS = {
 }
 
 EXPECTED_SKILLS = [
+    "atlas",
     "character-sim",
-    "correct",
     "creative-research",
     "creative-writing-craft",
     "creative-writing-muse",
+    "explore-and-engage",
     "grill",
-    "information-hierarchy",
     "intent-modeling",
     "knowledge-layers",
     "llm-writing",
@@ -91,7 +94,6 @@ EXPECTED_SKILLS = [
     "qi-layer",
     "qi-maintenance",
     "reader-sim",
-    "reflect",
     "shared-dao",
     "shared-workspace",
     "story-memory",
@@ -102,7 +104,6 @@ EXPECTED_SKILLS = [
     "writing-principles",
     "writing-staffing",
     "writing-sync",
-    "zoom-out",
 ]
 
 FORBIDDEN_REMNANTS = [
@@ -335,7 +336,7 @@ class Checker:
             if (fm.get("mainAgent") is True) != expected_main:
                 self.error(f"Agent {agent_name}: mainAgent expected {expected_main}, got {fm.get('mainAgent')}")
 
-            expected_subagent = agent_name != "muse"
+            expected_subagent = agent_name not in PRIMARY_ONLY
             if (fm.get("subagent") is True) != expected_subagent:
                 self.error(f"Agent {agent_name}: subagent expected {expected_subagent}, got {fm.get('subagent')}")
 
@@ -522,8 +523,8 @@ class Checker:
             if findings:
                 self.error(f"`agy plugin validate --strict` emitted findings: {findings}")
             components = report.get("components", {})
-            if components.get("agents") != 15:
-                self.error(f"`agy validate` discovered {components.get('agents')} agents, expected 15")
+            if components.get("agents") != len(EXPECTED_AGENTS):
+                self.error(f"`agy validate` discovered {components.get('agents')} agents, expected {len(EXPECTED_AGENTS)}")
             if components.get("skills") != len(EXPECTED_SKILLS):
                 self.error(f"`agy validate` discovered {components.get('skills')} skills, expected {len(EXPECTED_SKILLS)}")
         except json.JSONDecodeError:

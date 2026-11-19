@@ -3,7 +3,7 @@
 [![Antigravity 2.0](https://img.shields.io/badge/Antigravity-2.0-blue.svg)](https://antigravity.google)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-A native Antigravity plugin with 15 agents and 27 skills for writing fiction.
+A native Antigravity plugin with 17 agents and 25 skills for writing fiction.
 
 ---
 
@@ -29,13 +29,15 @@ The [plugin schema](https://antigravity.google/docs/build-plugins) accepts model
 
 ---
 
-## Agent Roster (15 Agents)
+## Agent Roster (17 Agents)
 
-Muse is the main creative partner; it can delegate to 14 specialists. Writer, character-sim, and outliner are also available as primary agents. When you select one directly, choose its session model in the app; the tier column below applies to delegated work.
+Muse is the main creative partner; it can delegate to 14 specialists. Spark and Setup are primary-only agents. Writer, character-sim, and outliner can also run as primary agents. Choose the session model in the app.
 
 | Agent | Delegated tier | Responsibility |
 | --- | --- | --- |
 | `muse` | Main agent only | Discussion, plans, drafts, and final verdicts |
+| `spark` | Main agent only | Lightweight, single-session brainstorming and drafting |
+| `setup` | Main agent only | Author interview and approved project setup |
 | `writer` | `inherit` | Drafts, revisions, bridges, alternate takes, and line polish |
 | `outliner` | `inherit` | Narrative arcs, chapter beats, and scene structures |
 | `critic` | `inherit` | Editorial diagnosis with findings anchored to the draft |
@@ -53,14 +55,14 @@ Muse is the main creative partner; it can delegate to 14 specialists. Writer, ch
 
 ---
 
-## 27 Bundled Craft Skills
+## 25 Bundled Craft Skills
 
 The plugin packages these skills:
 
 - **Writing Craft & Style**: `creative-writing-craft`, `writing-principles`, `llm-writing`, `writing-staffing`, `creative-writing-muse`.
-- **Planning & Architecture**: `story-planning`, `story-workflow`, `intent-modeling`, `grill`.
+- **Planning & Architecture**: `story-planning`, `story-workflow`, `intent-modeling`, `grill`, `explore-and-engage`, `atlas`.
 - **Review & Continuity**: `story-review`, `reader-sim`, `character-sim`, `md-validation`, `shared-dao`.
-- **Knowledge Governance**: `story-memory`, `knowledge-layers`, `qi-layer`, `qi-maintenance`, `information-hierarchy`, `correct`, `reflect`, `zoom-out`, `shared-workspace`.
+- **Knowledge Governance**: `story-memory`, `knowledge-layers`, `qi-layer`, `qi-maintenance`, `shared-workspace`.
 - **Research & Setup**: `project-setup`, `creative-research`, `structured-artifact`, `writing-sync`.
 
 ---
@@ -90,7 +92,7 @@ In your project directory, run:
 ```text
 /project-setup
 ```
-Answer the setup interview questions. The skill will scaffold your `AGENTS.md` and initial `kb/` directory hierarchy (`characters/`, `world/`, `timeline/`, `styles/`).
+You can also select `setup` or run `agy --agent setup`. Both entry points use the same interview and wait for approval before creating the project files.
 
 ### 2. Launch Muse
 In Antigravity Desktop App, select **`muse`** from the Agent dropdown and choose your preferred model in the model picker. In CLI:
@@ -102,8 +104,8 @@ agy --agent muse
 
 - **Brainstorm & Outline**: *"Muse, let's explore possibilities for the climax of Act 1."* Muse discusses directions with you and can delegate a separate structural pass to `outliner`.
 - **Drafting**: *"Let's draft Scene 1 from the outline."* Muse drafts with you using the voice in `kb/styles/`, or delegates a fresh draft, revision, alternate take, polish pass, or long draft to `writer`.
-- **Multi-Lane Review**: When a scene is ready, Muse invokes `critic`, `continuity-checker`, and `reader-sim` concurrently for actionable feedback.
-- **Knowledge Capture**: When the scene is approved, Muse dispatches `kb-lead` to keep character sheets and timelines current.
+- **Multi-Lane Review**: Muse can run `critic` and `continuity-checker` side by side, then send the revised text to `reader-sim` for a first read.
+- **Knowledge Capture**: When the scene is approved, Muse dispatches `kb-lead` to keep character sheets and timelines current. Ask Muse for an interactive Atlas when you want a map of the cast, factions, or plot.
 
 ---
 

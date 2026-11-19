@@ -68,7 +68,7 @@ direction, or accept it.
 ## After Work Settles
 
 When a chapter, a revision, or an author ruling settles and the work will
-pause, record what settled. When you can spawn `@kb-lead`, do: tell it to
+pause, record what settled. When you can spawn `kb-lead`, do: tell it to
 load `/story-memory`, and brief it with what settled and the files that show
 it. Otherwise apply `/story-memory` yourself. Brainstorms, drafts, and provisional choices stay in
 the work directory; the kb records as settled only what the author confirmed

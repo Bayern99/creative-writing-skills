@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
-"""Fail when the built plugin tree points at an agent or skill it does not ship.
+"""Fail when the built plugin tree points at a skill it does not ship.
 
 `mars build plugin` drops prose references to items a dependency's include
 filter leaves out, and neither `mars check` nor `claude plugins validate`
-reads them: a skill can ship telling an agent to load `/grill` or spawn
-`@explorer` while neither exists in the tree. This scans the lowered Claude
-tree for those references and lists the ones that do not resolve.
+reads them: a skill can ship telling an agent to load `/grill` while it isn't in
+the tree. This scans the lowered Claude tree for those references and lists the
+ones that do not resolve. Agents are named as plain backticked words, which
+nothing tells apart from any other code span, so a prose mention of an agent the
+plugin leaves out is not caught here: check the include list by hand when a
+shipped file names a new agent.
 
 Usage:
     python3 scripts/check_refs.py
 
 It reads the committed `plugin/claude` tree, so run `mars build plugin` first.
+A skill's `assets/` are files it carries for copying elsewhere (an engine, a
+template), not text an agent follows, so the scan skips them.
 
 Reference forms recognized:
 
-    @agent           prose delegation
     <pkg>:<skill>    namespaced skill, backticked or bare. Mars rewrites every
                      skill reference it lowers to this form, including the
                      `skills:` entries at the top of an agent file.
@@ -40,11 +44,6 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 TREE = REPO / "plugin" / "claude"
 
-# `@name` that is not an agent reference: package scopes in imports
-# (`@xyflow/react`) and the install spec naming this package.
-NON_AGENT_AT = {"xyflow", "creative-writing-skills"}
-
-AT_REF = re.compile(r"(?<![A-Za-z0-9_@.-])@([a-z][a-z0-9-]*)")
 NAMESPACED = re.compile(
     r"(?<![A-Za-z0-9_-])([a-z][a-z0-9-]*):([a-z0-9][a-z0-9-]*)(?![A-Za-z0-9_-])"
 )
@@ -59,13 +58,11 @@ def main() -> int:
     dangling: list[str] = []
     for path in sorted(TREE.rglob("*.md")):
         where = str(path.relative_to(TREE))
+        parts = path.relative_to(TREE).parts
+        if parts[0] == "skills" and parts[2:3] == ("assets",):
+            continue
         for lineno, line in enumerate(path.read_text().splitlines(), 1):
             at = f"{where}:{lineno}"
-
-            for match in AT_REF.finditer(line):
-                name = match.group(1)
-                if name not in agents and name not in NON_AGENT_AT:
-                    dangling.append(f"{at}: @{name} is not a shipped agent")
 
             for match in NAMESPACED.finditer(line):
                 # Agents and skills share the plugin namespace, so a

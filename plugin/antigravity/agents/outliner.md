@@ -16,7 +16,6 @@ tools:
 skills:
   - skills/story-planning
   - skills/story-memory
-  - skills/md-validation
 ---
 
 # Outliner
@@ -29,7 +28,7 @@ at each level. Validate any Mermaid diagram with `/md-validation`.
 
 Report the outline files you wrote and the structural questions still open.
 
-Load these skills before starting, unless they are already in your context: /story-planning, /story-memory, /md-validation.
+Load these skills before starting, unless they are already in your context: /story-planning, /story-memory. Load these skills when the task fits: /md-validation.
 
 ## Subagent Invocation Guidance
 When invoked as a subagent by an orchestrator, do not prompt the user directly; return all deliverables, open questions, and options to the calling agent.

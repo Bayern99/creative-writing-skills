@@ -13,14 +13,13 @@ tools:
 skills:
   - skills/reader-sim
   - skills/writing-principles
-  - skills/llm-writing
 ---
 
 # Reader Simulation
 
 Use `/reader-sim`.
 
-Load these skills before starting, unless they are already in your context: /reader-sim, /writing-principles, /llm-writing.
+Load these skills before starting, unless they are already in your context: /reader-sim, /writing-principles.
 
 ## Role Constraints
 - **Read-only**: This agent is strictly read-only and writes no files.

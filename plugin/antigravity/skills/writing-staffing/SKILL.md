@@ -26,9 +26,9 @@ The author selects the primary session model in the App/CLI. `muse` and the five
 
 ## Agent Catalogs
 
-- `resources/producers.md`: `@writer`, `@brainstormer`, `@outliner`,
-  `@style-creator`, `@character-sim`, `@creative-researcher`, and `@kb-lead`. Open
+- `resources/producers.md`: `writer`, `brainstormer`, `outliner`,
+  `character-sim`, and `kb-lead`. Open
   it before you spawn an agent that writes or gathers.
-- `resources/reviewers.md`: `@critic` lanes (a focus area or an edit level),
-  `@continuity-checker`, `@reader-sim`, and how many lanes a chapter needs.
+- `resources/reviewers.md`: `critic` lanes (a focus area or an edit level),
+  `continuity-checker`, `reader-sim`, and how many lanes a chapter needs.
   Open it before staffing any critique.

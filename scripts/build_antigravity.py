@@ -7,9 +7,9 @@ plugin at plugin/antigravity/.
 
 Pipeline:
 1. Validates and copies package metadata from mars.toml into plugin.json
-2. Transforms 15 agents from plugin/claude/agents/*.md using antigravity/agents.toml
+2. Transforms agents from plugin/claude/agents/*.md using antigravity/agents.toml
    (applying role-specific inherit/flash models, sandbox policy, role constraints)
-3. Copies and transforms all 27 skills from plugin/claude/skills/*
+3. Copies and transforms the resolved skills from plugin/claude/skills/*
    (rewriting /creative-writing-skills:<skill> -> /<skill>, stripping Claude artifacts)
 4. Applies antigravity/patches.toml with strict SHA-256 integrity verification
 5. Injects antigravity/overlay/ assets, rules, guides, hooks.json, and git_guard.py
@@ -62,7 +62,8 @@ SUBAGENT_ONLY = {
     "kb-maintainer",
 }
 
-ENTRY_AGENTS = {"muse", "writer", "character-sim", "outliner"}
+PRIMARY_ONLY = {"muse", "setup", "spark"}
+ENTRY_AGENTS = PRIMARY_ONLY | {"writer", "character-sim", "outliner"}
 
 SKILL_REF_PATTERN_SLASH = re.compile(r"/creative-writing-skills:([a-zA-Z0-9_-]+)")
 SKILL_REF_PATTERN_PLAIN = re.compile(r"\bcreative-writing-skills:([a-zA-Z0-9_-]+)")
@@ -229,7 +230,7 @@ def build_agents(
     target_dir: Path,
     patches_by_file: Dict[str, Dict[str, Any]],
 ) -> None:
-    """Transform all 15 agents from plugin/claude/agents/ using antigravity/agents.toml."""
+    """Transform the resolved agents using antigravity/agents.toml."""
     if not CONFIG_AGENTS_TOML.is_file():
         raise FileNotFoundError(f"Missing agents configuration: {CONFIG_AGENTS_TOML}")
 
@@ -260,16 +261,12 @@ def build_agents(
 
         agent_cfg = agents_table.get(agent_name, {})
 
-        # Muse follows the session selector; specialists use their configured tier.
-        if agent_name == "muse":
-            model = "inherit"
-        else:
-            model = agent_cfg.get("model", default_model)
-            if model not in {"flash", "flash_lite", "pro", "inherit"}:
-                model = "flash"
+        model = agent_cfg.get("model", default_model)
+        if model not in {"flash", "flash_lite", "pro", "inherit"}:
+            raise ValueError(f"Invalid Antigravity model tier '{model}' for {agent_name}")
 
         main_agent = agent_cfg.get("mainAgent", agent_name in ENTRY_AGENTS)
-        subagent = agent_cfg.get("subagent", agent_name != "muse")
+        subagent = agent_cfg.get("subagent", agent_name not in PRIMARY_ONLY)
         policy = agent_cfg.get("commandExecutionPolicy", default_policy)
 
         description = agent_cfg.get("description") or src_fm.get("description", "")
@@ -295,7 +292,7 @@ def build_agents(
                 "\n\n## Role Constraints\n"
                 "- **Reporting**: Do not prompt the user directly; return all deliverables, open questions, and choices to the caller."
             )
-        elif agent_name in ENTRY_AGENTS and agent_name != "muse":
+        elif agent_name in ENTRY_AGENTS and subagent:
             body += (
                 "\n\n## Subagent Invocation Guidance\n"
                 "When invoked as a subagent by an orchestrator, do not prompt the user directly; "
@@ -358,10 +355,12 @@ def build_skills(
         for src_item in sorted(skill_path.rglob("*")):
             if src_item.is_dir():
                 continue
-            if "__pycache__" in src_item.parts or any(p.startswith(".") for p in src_item.parts):
-                continue
-
             rel_to_skill = src_item.relative_to(skill_path)
+            if "__pycache__" in rel_to_skill.parts:
+                continue
+            # The Atlas template ships engine instructions in assets/atlas/.context/.
+            if any(part.startswith(".") and part != ".context" for part in rel_to_skill.parts):
+                continue
 
             # Skip obsolete non-Antigravity harness guides in project-setup
             if skill_name == "project-setup" and rel_to_skill.name in OBSOLETE_SETUP_RESOURCES:
@@ -373,10 +372,8 @@ def build_skills(
             rel_to_claude = f"skills/{skill_name}/{rel_to_skill.as_posix()}"
             raw_bytes = src_item.read_bytes()
 
-            # Apply patch if present
-            content_text = apply_patch_if_present(rel_to_claude, raw_bytes, patches_by_file)
-
-            if src_item.suffix in text_extensions:
+            if rel_to_claude in patches_by_file or src_item.suffix in text_extensions:
+                content_text = apply_patch_if_present(rel_to_claude, raw_bytes, patches_by_file)
                 content_text = rewrite_skill_references(content_text)
                 dest_item.write_text(content_text, encoding="utf-8")
             else:

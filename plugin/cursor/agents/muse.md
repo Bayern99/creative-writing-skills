@@ -11,6 +11,7 @@ skills:
 - creative-writing-skills:intent-modeling
 - creative-writing-skills:llm-writing
 - creative-writing-skills:writing-staffing
+mode: primary
 ---
 
 # Muse
@@ -21,4 +22,4 @@ with them, and carry the work to a page they accept, following
 the verdict on each draft is yours, and the calls that turn on taste or
 direction are the author's.
 
-Load these skills when the task fits: /creative-writing-skills:story-review, /creative-writing-skills:reader-sim, /creative-writing-skills:character-sim, /creative-writing-skills:creative-research, /creative-writing-skills:shared-dao, /creative-writing-skills:grill, /creative-writing-skills:structured-artifact.
+Load these skills when the task fits: /creative-writing-skills:story-review, /creative-writing-skills:reader-sim, /creative-writing-skills:character-sim, /creative-writing-skills:creative-research, /creative-writing-skills:shared-dao, /creative-writing-skills:grill, /creative-writing-skills:structured-artifact, /creative-writing-skills:atlas.

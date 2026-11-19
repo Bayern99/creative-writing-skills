@@ -20,7 +20,7 @@ Verify installation:
 agy plugin list
 agy agents
 ```
-You will see `creative-writing-skills` enabled with its 15 agents and 27 skills.
+You will see `creative-writing-skills` enabled with its 17 agents and 25 skills.
 
 ### Via Antigravity Desktop App
 
@@ -31,8 +31,10 @@ Place the complete `plugin/antigravity/` directory at `~/.gemini/config/plugins/
 ## Agent Setup & Starting a Session
 
 ### Selecting Your Main Agent
-In Antigravity, four primary entry points are exposed in the Agent dropdown:
+In Antigravity, six primary entry points are exposed in the Agent dropdown:
 - **`muse` (Recommended)**: Your collaborative creative partner. Coordinates 14 specialist subagents, leads planning and drafting, and owns the verdict on drafts. Uses your session model selection.
+- **`setup`**: Guides project initialization and asks for approval before writing files.
+- **`spark`**: Brainstorms and drafts in a single session.
 - **`writer`**: Standalone production prose writer for quick drafting or revisions.
 - **`character-sim`**: Interactive in-character conversational partner for voice discovery.
 - **`outliner`**: Dedicated story architect for outline generation.
@@ -55,28 +57,9 @@ For clickable child conversations, choose **Settings > General > Interface Layou
 
 ## First Session: Project Setup
 
-1. In your project workspace, run:
-   ```text
-   /project-setup
-   ```
-   *(Note: `/project-setup` is author-invoked and guides you through an initial creative interview).*
-
-2. The interview helps establish:
-   - **`AGENTS.md`**: Project overview, active storylines, genre rules, and voice principles.
-   - **`kb/` Layout**:
-     - `kb/characters/`: Character profiles and relationship sheets.
-     - `kb/world/`: Canon lore, geography, rules of the world.
-     - `kb/timeline/`: Chronological sequence of events.
-     - `kb/styles/`: Voice guides and prose samples.
-   - **`work/` Directory**: Transient working files for brainstorms, outlines, and critiques.
-
-3. Commit the initial structure with git:
-   ```bash
-   git add AGENTS.md kb/
-   git commit -m "Initialize story project structure"
-   ```
-
----
+Run `/project-setup` or select `setup` to start the author interview. If you
+are already in that interview, continue at **Learn About the Project** in the
+skill. The approved layout can include `AGENTS.md`, `kb/`, and `work/`.
 
 ## Story Workflow: Writing a Chapter
 
@@ -88,10 +71,10 @@ For clickable child conversations, choose **Settings > General > Interface Layou
    Collaborate with `muse` on prose in its own context, or delegate a fresh draft, revision, alternate take, polish pass, or long draft to `writer`; pass the style guides in `kb/styles/` and ask it to report judgment calls to `muse`.
 
 3. **Review**:
-   `muse` invokes specialized reviewer subagents concurrently via `invoke_subagent`:
+   `muse` invokes the reviewer lanes needed for the draft via `invoke_subagent`:
    - **`critic`**: Evaluates narrative tension, character voice, and prose cadence.
    - **`continuity-checker`**: Flags contradictions against facts in `kb/` and timeline events.
-   - **`reader-sim`**: Provides emotional, moment-by-moment feedback from the reader's perspective.
+   - **`reader-sim`**: Reads the draft after the critique rounds converge and reports moment-by-moment reactions.
 
 4. **Revise**:
    `muse` synthesizes reviewer findings, helps you prioritize the highest-impact fixes, and revises with you or the existing `writer` instance. After two critique rounds on a chapter, it presents remaining concerns for your decision.

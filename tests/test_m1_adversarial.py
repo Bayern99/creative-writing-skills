@@ -44,14 +44,14 @@ class TestAdversarialTomlParsing(unittest.TestCase):
             data = tomllib.load(f)
         self.assertIn("defaults", data)
         self.assertIn("agents", data)
-        self.assertEqual(len(data["agents"]), 15)
+        self.assertEqual(len(data["agents"]), 17)
 
     def test_genuine_patches_toml_parses(self):
         self.assertTrue(PATCHES_TOML.exists(), f"{PATCHES_TOML} does not exist.")
         with open(PATCHES_TOML, "rb") as f:
             data = tomllib.load(f)
         self.assertIn("patches", data)
-        self.assertEqual(len(data["patches"]), 6)
+        self.assertEqual(len(data["patches"]), 8)
 
     def test_agents_toml_malformed_syntax_corruptions(self):
         raw_bytes = AGENTS_TOML.read_bytes()
@@ -79,7 +79,7 @@ class TestAdversarialTomlParsing(unittest.TestCase):
 
         corruptions = [
             ("unclosed_multiline_string", raw_text.replace('"""## First, Load One Environment Walkthrough', '""## First, Load One Environment Walkthrough')),
-            ("unterminated_multiline_triple_quote", raw_text.replace('use the environment you are\nin."""', 'use the environment you are\nin.""')),
+            ("unterminated_multiline_triple_quote", raw_text.replace('Do not load the others."""', 'Do not load the others.""')),
             ("duplicate_section_header", raw_text.replace('[[patches]]', '[[patches]]\n[[patches]]\nfile = "skills/project-setup/SKILL.md"\nfile = "dupe"')),
             ("invalid_key_assignment", raw_text.replace('sha256 = "', 'sha256 : "')),
         ]
@@ -113,7 +113,7 @@ class TestAdversarialPatchHashMismatch(unittest.TestCase):
             self.patches_data = tomllib.load(f)["patches"]
 
     def test_all_upstream_files_exist_and_hashes_match(self):
-        self.assertEqual(len(self.patches_data), 6)
+        self.assertEqual(len(self.patches_data), 8)
         for p in self.patches_data:
             target = UPSTREAM_CLAUDE_DIR / p["file"]
             self.assertTrue(target.exists(), f"Target file does not exist: {target}")
@@ -334,13 +334,11 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
         )
 
     def test_subagents_follow_role_model_policy(self):
-        """Creative judgment roles inherit; the nine other specialists use flash."""
+        """Primary-only agents and creative judgment specialists inherit. Other specialists use flash."""
         agents = self.config["agents"]
         for name, cfg in agents.items():
-            if name == "muse":
-                continue
             model = cfg.get("model", self.config.get("defaults", {}).get("model"))
-            inherited = {"writer", "critic", "outliner", "style-creator", "kb-lead"}
+            inherited = {"muse", "setup", "spark", "writer", "critic", "outliner", "style-creator", "kb-lead"}
             expected = "inherit" if name in inherited else "flash"
             self.assertEqual(
                 model,
@@ -364,8 +362,8 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
 
 
     def test_main_agent_flags(self):
-        """Only muse, writer, character-sim, outliner may have mainAgent: true."""
-        expected_main = {"muse", "writer", "character-sim", "outliner"}
+        """Primary and dual-mode agents are selectable in the main session."""
+        expected_main = {"muse", "setup", "spark", "writer", "character-sim", "outliner"}
         for name, cfg in self.config["agents"].items():
             is_main = cfg.get("mainAgent", False)
             if name in expected_main:
@@ -374,11 +372,11 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
                 self.assertFalse(is_main, f"Expected {name} to have mainAgent=False")
 
     def test_subagent_flags(self):
-        """Muse must have subagent=False, all other 14 must have subagent=True."""
+        """Only the 14 specialists can run as subagents."""
         for name, cfg in self.config["agents"].items():
             is_sub = cfg.get("subagent", True)
-            if name == "muse":
-                self.assertFalse(is_sub, "muse must have subagent=False")
+            if name in {"muse", "setup", "spark"}:
+                self.assertFalse(is_sub, f"agent {name} must have subagent=False")
             else:
                 self.assertTrue(is_sub, f"agent {name} must have subagent=True")
 
@@ -412,14 +410,12 @@ class TestAdversarialModelAndAgentsConfig(unittest.TestCase):
     def test_muse_subagents_list_coverage(self):
         """Muse declares subagents it orchestrates. Check coverage of subagents."""
         declared = set(self.config["agents"]["muse"].get("subagents", []))
-        all_other_agents = set(self.config["agents"].keys()) - {"muse"}
-        missing = all_other_agents - declared
+        specialists = {name for name, cfg in self.config["agents"].items() if cfg["subagent"]}
+        self.assertEqual(declared, specialists)
         self.assertIn("writer", declared)
         self.assertIn("critic", declared)
         self.assertIn("reader-sim", declared)
         self.assertIn("kb-lead", declared)
-        # Muse declares all 14 subagents so missing is empty
-        self.assertEqual(missing, set(), f"Unexpected omission from muse.subagents: {missing}")
 
 
 class TestAdversarialGitGuardHook(unittest.TestCase):

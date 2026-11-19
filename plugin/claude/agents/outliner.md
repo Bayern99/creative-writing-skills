@@ -5,16 +5,10 @@ model: sonnet
 skills:
 - creative-writing-skills:story-planning
 - creative-writing-skills:story-memory
-- creative-writing-skills:md-validation
-effort: high
 disallowedTools:
 - NotebookEdit
 - AskUserQuestion
-- Bash(git revert *)
-- Bash(git checkout -- *)
-- Bash(git restore *)
-- Bash(git reset --hard *)
-- Bash(git clean *)
+effort: high
 ---
 
 # Outliner
@@ -27,4 +21,4 @@ at each level. Validate any Mermaid diagram with `/creative-writing-skills:md-va
 
 Report the outline files you wrote and the structural questions still open.
 
-Load these skills before starting, unless they are already in your context: /creative-writing-skills:story-planning, /creative-writing-skills:story-memory, /creative-writing-skills:md-validation.
+Load these skills before starting, unless they are already in your context: /creative-writing-skills:story-planning, /creative-writing-skills:story-memory. Load these skills when the task fits: /creative-writing-skills:md-validation.
